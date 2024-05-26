@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="default_screen_background">#1A1B22</color>
-    <color name="main_screen_background">#000</color>
-
-    <color name="text_default">#fff</color>
-
-    <color name="control_default">#fff</color>
+    <color name="menu_background">@color/dark_blue</color>
 </resources>

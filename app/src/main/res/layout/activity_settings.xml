@@ -5,26 +5,18 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:background="@color/default_screen_background">
+    android:background="?attr/colorPrimarySurface">
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp" />
+        style="@style/ToolbarStyle"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/screen_horizontal_padding"
         android:orientation="vertical">
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <FrameLayout style="@style/SettingsItemStyle">
             <TextView
-                android:paddingVertical="@dimen/settings_screen_item_padding_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/settings_screen_item_font_size"
-                android:textColor="@color/text_default"
+                style="@style/SettingsItemLabelStyle"
                 android:text="@string/dark_theme"/>
             <Switch
                 android:layout_width="wrap_content"
@@ -33,57 +25,33 @@
                 tools:ignore="UseSwitchCompatOrMaterialXml" />
         </FrameLayout>
         <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:id="@+id/share_app"
+            style="@style/SettingsItemStyle">
             <TextView
-                android:paddingVertical="@dimen/settings_screen_item_padding_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/settings_screen_item_font_size"
-                android:textColor="@color/text_default"
+                style="@style/SettingsItemLabelStyle"
                 android:text="@string/share_app"/>
             <ImageView
-                app:tint="@color/control_default"
-                android:padding="@dimen/settings_screen_item_icon_padding"
-                android:layout_width="@dimen/settings_screen_item_icon_size"
-                android:layout_height="@dimen/settings_screen_item_icon_size"
-                android:layout_gravity="end|center_vertical"
-                android:src="@drawable/share_icon" />
+                style="@style/SettingsItemIconStyle"
+                android:src="@drawable/share_icon"/>
         </FrameLayout>
         <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:id="@+id/write_to_support"
+            style="@style/SettingsItemStyle">
             <TextView
-                android:paddingVertical="@dimen/settings_screen_item_padding_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/settings_screen_item_font_size"
-                android:textColor="@color/text_default"
+                style="@style/SettingsItemLabelStyle"
                 android:text="@string/write_to_support"/>
             <ImageView
-                app:tint="@color/control_default"
-                android:padding="@dimen/settings_screen_item_icon_padding"
-                android:layout_width="@dimen/settings_screen_item_icon_size"
-                android:layout_height="@dimen/settings_screen_item_icon_size"
-                android:layout_gravity="end|center_vertical"
-                android:src="@drawable/support_icon" />
+                style="@style/SettingsItemIconStyle"
+                android:src="@drawable/support_icon"/>
         </FrameLayout>
         <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:id="@+id/user_aggrement"
+            style="@style/SettingsItemStyle">
             <TextView
-                android:paddingVertical="@dimen/settings_screen_item_padding_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/settings_screen_item_font_size"
-                android:textColor="@color/text_default"
+                style="@style/SettingsItemLabelStyle"
                 android:text="@string/user_aggrement"/>
             <ImageView
-                app:tint="@color/control_default"
-                android:padding="@dimen/settings_screen_item_icon_padding"
-                android:layout_width="@dimen/settings_screen_item_icon_size"
-                android:layout_height="@dimen/settings_screen_item_icon_size"
-                android:layout_gravity="end|center_vertical"
+                style="@style/SettingsItemIconStyle"
                 android:src="@drawable/arrow_forward_icon" />
         </FrameLayout>
     </LinearLayout>
