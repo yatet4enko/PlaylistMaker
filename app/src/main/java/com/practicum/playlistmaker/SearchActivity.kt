@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View.OnTouchListener
 import android.view.inputmethod.InputMethodManager
@@ -16,6 +17,9 @@ import androidx.appcompat.widget.Toolbar
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var searchEditText: EditText
+
+    private var searchValue: String = ""
+
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +41,8 @@ class SearchActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                searchValue = s.toString()
+
                 updateSearchIcons(withClose = !s.isNullOrBlank())
             }
 
@@ -55,6 +61,18 @@ class SearchActivity : AppCompatActivity() {
         })
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString(SEARCH_VALUE_KEY, searchValue)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        searchEditText.setText(searchValue)
+    }
+
     private fun updateSearchIcons(withClose: Boolean) {
         searchEditText.setCompoundDrawablesWithIntrinsicBounds(
             getDrawable(R.drawable.search_icon),
@@ -69,5 +87,9 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.clearFocus()
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         inputMethodManager?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+    }
+
+    companion object {
+        private const val SEARCH_VALUE_KEY = "SEARCH_VALUE_KEY"
     }
 }
