@@ -12,15 +12,11 @@
         <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:textStyle">bold</item>
     </style>
-    <style name="MenuButtonStyle">
+    <style name="MenuButtonStyle" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:foreground">?attr/selectableItemBackground</item>
         <item name="iconGravity">textStart</item>
         <item name="iconTint">@color/black</item>
         <item name="iconSize">@dimen/main_screen_button_icon_size</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_weight">1</item>
         <item name="android:backgroundTint">@color/white</item>
         <item name="android:textSize">@dimen/main_screen_button_font_size</item>
         <item name="android:textColor">@color/dark_blue</item>
@@ -28,14 +24,8 @@
         <item name="elevation">0dp</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
     </style>
-    <style name="SettingsItemStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
     <style name="SettingsItemLabelStyle">
         <item name="android:paddingVertical">@dimen/settings_screen_item_padding_vertical</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/settings_screen_item_font_size</item>
         <item name="android:textColor">?attr/colorPrimaryDark</item>
         <item name="android:fontFamily">@font/ys_display_regular</item>

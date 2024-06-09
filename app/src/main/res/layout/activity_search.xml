@@ -7,26 +7,21 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         style="@style/ToolbarStyle"/>
-    <LinearLayout
+    <EditText
         android:theme="@style/Theme.SearchEditText"
-        android:layout_width="match_parent"
+        android:id="@+id/search_edit_text"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="@dimen/screen_horizontal_padding"
-        android:orientation="vertical">
-        <EditText
-            android:id="@+id/search_edit_text"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:hint="@string/search"
-            android:maxLines="1"
-            android:inputType="text"
-            android:drawablePadding="@dimen/space_m"
-            android:drawableTint="?attr/colorAccent"
-            android:padding="@dimen/space_m"
-            android:textSize="@dimen/text_size_m"
-            android:background="@drawable/rounded_edittext"
-            android:backgroundTint="?attr/colorPrimarySurface"
-            android:textColor="?attr/colorPrimary"
-            android:textColorHint="?attr/colorAccent" />
-    </LinearLayout>
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="@dimen/screen_horizontal_padding"
+        android:hint="@string/search"
+        android:maxLines="1"
+        android:inputType="text"
+        android:drawablePadding="@dimen/space_m"
+        android:drawableTint="?attr/colorAccent"
+        android:padding="@dimen/space_m"
+        android:textSize="@dimen/text_size_m"
+        android:background="@drawable/rounded_edittext"
+        android:backgroundTint="?attr/colorPrimarySurface"
+        android:textColor="?attr/colorPrimary"
+        android:textColorHint="?attr/colorAccent" />
 </LinearLayout>

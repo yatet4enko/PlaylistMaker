@@ -16,7 +16,7 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<Toolbar>(R.id.toolbar).let {
             title = ""
             setSupportActionBar(it)
-            title = resources.getString(R.string.settings)
+            title = getString(R.string.settings)
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -41,13 +41,13 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<FrameLayout>(R.id.write_to_support).setOnClickListener {
-            val intent = Intent(Intent.ACTION_SENDTO)
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:")
 
-            intent.data = Uri.parse("mailto:")
-
-            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(STUDENT_EMAIL))
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Сообщение разработчикам и разработчицам приложения Playlist Maker");
-            intent.putExtra(Intent.EXTRA_TEXT, "Спасибо разработчикам и разработчицам за крутое приложение!");
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(STUDENT_EMAIL))
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.support_message_subject))
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.support_message_text))
+            }
 
             startActivity(intent)
         }

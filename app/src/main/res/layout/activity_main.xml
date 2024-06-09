@@ -26,16 +26,28 @@
             android:id="@+id/search_button"
             style="@style/MenuButtonStyle"
             app:icon="@drawable/search_icon"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="8dp"
             android:text="@string/search" />
         <Button
             android:id="@+id/media_button"
             style="@style/MenuButtonStyle"
             app:icon="@drawable/media_icon"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="8dp"
             android:text="@string/media"/>
         <Button
             android:id="@+id/settings_button"
             style="@style/MenuButtonStyle"
             app:icon="@drawable/settings_icon"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="8dp"
             android:text="@string/settings"/>
     </LinearLayout>
 </LinearLayout>
