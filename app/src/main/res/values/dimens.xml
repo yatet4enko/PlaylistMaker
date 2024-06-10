@@ -2,16 +2,20 @@
 <resources>
     <dimen name="screen_horizontal_padding">16dp</dimen>
 
-    <dimen name="header_text_size">22sp</dimen>
-    <dimen name="header_padding_top">10dp</dimen>
-    <dimen name="header_padding_bottom">12dp</dimen>
-
     <dimen name="main_screen_button_font_size">22sp</dimen>
-    <dimen name="main_screen_button_corner_radius">16dp</dimen>
     <dimen name="main_screen_button_icon_size">24dp</dimen>
 
     <dimen name="settings_screen_item_font_size">16sp</dimen>
     <dimen name="settings_screen_item_padding_vertical">20dp</dimen>
     <dimen name="settings_screen_item_icon_size">48dp</dimen>
     <dimen name="settings_screen_item_icon_padding">12dp</dimen>
+
+    <dimen name="text_size_l">22sp</dimen>
+    <dimen name="text_size_m">16sp</dimen>
+
+    <dimen name="corner_radius_l">16dp</dimen>
+    <dimen name="corner_radius_s">8dp</dimen>
+    
+    <dimen name="space_m">10dp</dimen>
+    <dimen name="space_l">12dp</dimen>
 </resources>
