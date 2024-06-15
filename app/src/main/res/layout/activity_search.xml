@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="?attr/colorPrimarySurface">
     <androidx.appcompat.widget.Toolbar
@@ -23,5 +24,11 @@
         android:background="@drawable/rounded_edittext"
         android:backgroundTint="?attr/colorPrimarySurface"
         android:textColor="?attr/colorPrimary"
-        android:textColorHint="?attr/colorAccent" />
+        android:textColorHint="?attr/colorAccent"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_results"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/space_xl"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 </LinearLayout>

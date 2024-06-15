@@ -37,4 +37,20 @@
         <item name="android:layout_height">@dimen/settings_screen_item_icon_size</item>
         <item name="android:layout_gravity">end|center_vertical</item>
     </style>
+    <style name="TrackNameStyle">
+        <item name="android:textSize">@dimen/text_size_m</item>
+        <item name="android:textColor">?attr/colorPrimaryDark</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+    </style>
+    <style name="TrackDescriptionStyle">
+        <item name="android:textSize">@dimen/text_size_s</item>
+        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+    </style>
+    <style name="TrackIconStyle">
+        <item name="tint">?attr/colorAccent</item>
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
 </resources>
