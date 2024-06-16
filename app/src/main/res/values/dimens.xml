@@ -12,10 +12,14 @@
 
     <dimen name="text_size_l">22sp</dimen>
     <dimen name="text_size_m">16sp</dimen>
+    <dimen name="text_size_s">12sp</dimen>
 
     <dimen name="corner_radius_l">16dp</dimen>
     <dimen name="corner_radius_s">8dp</dimen>
-    
+
+    <dimen name="space_xs">6dp</dimen>
+    <dimen name="space_s">8dp</dimen>
     <dimen name="space_m">10dp</dimen>
     <dimen name="space_l">12dp</dimen>
+    <dimen name="space_xl">16dp</dimen>
 </resources>
