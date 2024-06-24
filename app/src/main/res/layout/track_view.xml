@@ -22,12 +22,16 @@
             style="@style/TrackNameStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
             tools:text="@string/dark_theme"/>
         <TextView
             android:id="@+id/track_description"
             style="@style/TrackDescriptionStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
             tools:text="@string/dark_theme"/>
     </LinearLayout>
     <ImageView
