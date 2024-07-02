@@ -95,6 +95,20 @@
                 android:text="@string/search_500_2"
                 style="@style/SearchErrorStyle">
             </TextView>
+            <Button
+                android:id="@+id/update_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xl"
+                android:text="@string/update"
+                android:textSize="@dimen/text_size_s"
+                android:textColor="?attr/colorPrimarySurface"
+                android:backgroundTint="?attr/colorPrimary"
+                android:fontFamily="@font/ys_display_medium"
+                android:layout_gravity="center"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="8dp"
+                />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

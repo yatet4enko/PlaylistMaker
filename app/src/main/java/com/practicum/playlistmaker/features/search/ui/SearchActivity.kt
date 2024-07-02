@@ -14,6 +14,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -60,6 +61,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var notFoundView: View
     private lateinit var errorView: View
+    private lateinit var updateButton: Button
 
     private var searchValue: String = ""
 
@@ -101,7 +103,12 @@ class SearchActivity : AppCompatActivity() {
         errorView = findViewById(R.id.error)
         progressBar = findViewById(R.id.progress)
         searchEditText = findViewById(R.id.search_edit_text)
+        updateButton = findViewById(R.id.update_button)
         updateSearchIcons(withClose = false)
+
+        updateButton.setOnClickListener {
+            searchTracks(searchEditText.text.toString())
+        }
 
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -205,21 +212,21 @@ class SearchActivity : AppCompatActivity() {
         showLoadingState()
 
         tracksService.searchTracks(text).enqueue(object : Callback<TracksResponse> {
-            override fun onResponse(call: Call<TracksResponse>,
-                                    response: Response<TracksResponse>
-            ) {
-                if (response.code() == 200) {
-                    if (response.body()?.results?.isNotEmpty() == true) {
-                        val formattedTracks = response.body()?.results!!.map {
-                            formatTrack(it)
-                        }
-
-                       showSearchResults(formattedTracks)
-                    } else {
-                        showEmptyState()
-                    }
-                } else {
+            override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
+                if (response.code() != 200) {
                     showErrorState()
+                    return
+                }
+
+                val results = response.body()?.results
+                if (results?.isNotEmpty() == true) {
+                    val formattedTracks = results.map {
+                        formatTrack(it)
+                    }
+
+                    showSearchResults(formattedTracks)
+                } else {
+                    showEmptyState()
                 }
             }
 
