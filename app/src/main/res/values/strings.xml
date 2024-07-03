@@ -10,4 +10,8 @@
     <string name="open_messenger_error">Не удалось открыть мессенджер</string>
     <string name="support_message_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
     <string name="support_message_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="search_404">Ничего не нашлось</string>
+    <string name="search_500_1">Проблемы со связью</string>
+    <string name="search_500_2">Загрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="update">Обновить</string>
 </resources>
