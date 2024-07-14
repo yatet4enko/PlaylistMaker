@@ -37,7 +37,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         findViewById<FrameLayout>(R.id.share_app).setOnClickListener {
-            val intent = Intent(Intent.ACTION_SENDTO)
+            val intent = Intent(Intent.ACTION_SEND)
             intent.putExtra(Intent.EXTRA_TEXT, PRACTICUM_URL);
             intent.setType("text/plain");
 

@@ -25,6 +25,7 @@
         android:backgroundTint="?attr/colorPrimarySurface"
         android:textColor="?attr/colorPrimary"
         android:textColorHint="?attr/colorAccent"
+        android:textCursorDrawable="@drawable/edit_text_cursor"
         android:imeOptions="actionDone"
         android:singleLine="true"/>
     <FrameLayout
@@ -42,6 +43,7 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
             <ProgressBar
                 android:id="@+id/progress"
+                android:indeterminateTint="@color/blue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

@@ -23,6 +23,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/dark_theme"/>
             <com.google.android.material.switchmaterial.SwitchMaterial
+                style="@style/SwitchStyle"
                 android:id="@+id/theme_swith"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

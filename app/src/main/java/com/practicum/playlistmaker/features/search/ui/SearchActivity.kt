@@ -261,11 +261,13 @@ class SearchActivity : AppCompatActivity() {
         inner class SearchResultsItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
             private val artwork: ImageView = itemView.findViewById(R.id.track_artwork)
             private val title: TextView = itemView.findViewById(R.id.track_title)
-            private val description: TextView = itemView.findViewById(R.id.track_description)
+            private val artist: TextView = itemView.findViewById(R.id.track_artist)
+            private val duration: TextView = itemView.findViewById(R.id.track_duration)
 
             fun bind(track: Track) {
                 title.text = track.trackName
-                description.text = "${track.artistName}  •  ${track.trackTime}"
+                artist.text = "${track.artistName}"
+                duration.text = "  •  ${track.trackTime}"
 
                 itemView.setOnClickListener {
                     onTrackClick(track)
