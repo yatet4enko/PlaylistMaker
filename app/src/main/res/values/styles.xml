@@ -58,4 +58,8 @@
         <item name="android:textSize">@dimen/text_size_l</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
     </style>
+    <style name="SwitchStyle" parent="Theme.AppCompat.Light">
+        <item name="trackTint">@color/gray_light</item>
+        <item name="thumbTint">@color/gray</item>
+    </style>
 </resources>
