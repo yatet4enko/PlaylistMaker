@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.features.search.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
@@ -29,8 +30,10 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.gson.Gson
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.common.ui.dpToPx
+import com.practicum.playlistmaker.features.player.ui.PlayerActivity
 import com.practicum.playlistmaker.features.search.data.dto.Track
 import com.practicum.playlistmaker.features.search.data.dto.TracksResponse
 import com.practicum.playlistmaker.features.search.data.dto.TracksResponseItem
@@ -43,6 +46,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.text.SimpleDateFormat
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 interface TracksApi {
@@ -57,6 +62,8 @@ class SearchActivity : AppCompatActivity() {
         .baseUrl("https://itunes.apple.com")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
+
+    private val gson = Gson()
 
     private val tracksService = retrofit.create(TracksApi::class.java)
 
@@ -287,6 +294,12 @@ class SearchActivity : AppCompatActivity() {
 
     private fun onTrackClick(track: Track) {
         onChangeRecentTracks(recentTracksRepository.addRecentTrack(track))
+
+        val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
+
+        intent.putExtra("TRACK", gson.toJson(track))
+
+        startActivity(intent)
     }
 
 
@@ -379,10 +392,24 @@ class SearchActivity : AppCompatActivity() {
             trackName = data.trackName,
             artistName = data.artistName,
             trackTime = trackTime,
-            artworkUrl100 = data.artworkUrl100
+            country = data.country,
+            primaryGenreName = data.primaryGenreName,
+            year = extractYear(data.releaseDate),
+            artworkUrl100 = data.artworkUrl100,
+            collectionName = data.collectionName,
         )
     }
 
+    private fun extractYear(dateTimeString: String): Int {
+        // Define the formatter for the given date-time string
+        val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+
+        // Parse the string to an OffsetDateTime object
+        val dateTime = OffsetDateTime.parse(dateTimeString, formatter)
+
+        // Extract the year
+        return dateTime.year
+    }
 
     companion object {
         private const val SEARCH_VALUE_KEY = "SEARCH_VALUE_KEY"
