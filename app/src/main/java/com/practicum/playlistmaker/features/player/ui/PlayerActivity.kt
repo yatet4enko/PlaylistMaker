@@ -37,7 +37,7 @@ class PlayerActivity : AppCompatActivity() {
         initPlayer()
 
         try {
-            gson.fromJson(intent.getStringExtra("TRACK"), Track::class.java)
+            gson.fromJson(intent.getStringExtra(TRACK_PARAM), Track::class.java)
         } catch (e: Exception) {
             println("parse track error ${e.stackTrace}")
             null
@@ -103,5 +103,9 @@ class PlayerActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    companion object {
+        const val TRACK_PARAM = "TRACK"
     }
 }

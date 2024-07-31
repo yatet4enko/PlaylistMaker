@@ -34,6 +34,7 @@ import com.google.gson.Gson
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.common.ui.dpToPx
 import com.practicum.playlistmaker.features.player.ui.PlayerActivity
+import com.practicum.playlistmaker.features.player.ui.PlayerActivity.Companion.TRACK_PARAM
 import com.practicum.playlistmaker.features.search.data.dto.Track
 import com.practicum.playlistmaker.features.search.data.dto.TracksResponse
 import com.practicum.playlistmaker.features.search.data.dto.TracksResponseItem
@@ -297,7 +298,7 @@ class SearchActivity : AppCompatActivity() {
 
         val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
 
-        intent.putExtra("TRACK", gson.toJson(track))
+        intent.putExtra(TRACK_PARAM, gson.toJson(track))
 
         startActivity(intent)
     }
