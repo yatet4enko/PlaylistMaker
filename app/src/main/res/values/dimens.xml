@@ -24,4 +24,5 @@
     <dimen name="space_m">10dp</dimen>
     <dimen name="space_l">12dp</dimen>
     <dimen name="space_xl">16dp</dimen>
+    <dimen name="space_xxl">24dp</dimen>
 </resources>
