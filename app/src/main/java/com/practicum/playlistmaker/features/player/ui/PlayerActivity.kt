@@ -1,10 +1,14 @@
 package com.practicum.playlistmaker.features.player.ui
 
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.MenuItem
 import android.view.View.VISIBLE
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
@@ -15,10 +19,23 @@ import com.google.gson.Gson
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.common.ui.dpToPx
 import com.practicum.playlistmaker.features.search.data.dto.Track
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+enum class PlayerState {
+    DEFAULT,
+    PREPARED,
+    PLAYING,
+    PAUSED,
+}
 
 class PlayerActivity : AppCompatActivity() {
 
     private val gson = Gson()
+
+    private var track: Track? = null
+
+    private val handler = Handler(Looper.getMainLooper())
 
     private lateinit var trackName: TextView
     private lateinit var artistName: TextView
@@ -29,12 +46,27 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var country: TextView
     private lateinit var albumGroup: Group
     private lateinit var artwork: ImageView
+    private lateinit var timing: TextView
+
+    private lateinit var playButton: ImageButton
+
+    private var mediaPlayer = MediaPlayer()
+    private var playerState = PlayerState.DEFAULT
+
+    private val updatePlayTimingRunnable = object : Runnable {
+        override fun run() {
+            updatePlayTiming()
+
+            handler.postDelayed(this, 300)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
 
-        initToolbar()
-        initPlayer()
+        initToolbarUI()
+        initPlayerUI()
 
         try {
             gson.fromJson(intent.getStringExtra(TRACK_PARAM), Track::class.java)
@@ -42,11 +74,29 @@ class PlayerActivity : AppCompatActivity() {
             println("parse track error ${e.stackTrace}")
             null
         }?.let {
+            track = it
             fulfillPlayer(it)
+            initPlayer()
         }
     }
 
-    private fun initPlayer() {
+    override fun onStop() {
+        super.onStop()
+
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        handler.removeCallbacks(updatePlayTimingRunnable)
+
+        pausePlayer()
+
+        mediaPlayer.release()
+    }
+
+    private fun initPlayerUI() {
         trackName = findViewById(R.id.track_name)
         artistName = findViewById(R.id.artist_name)
         duration = findViewById(R.id.duration_value)
@@ -56,15 +106,42 @@ class PlayerActivity : AppCompatActivity() {
         genre = findViewById(R.id.genre_value)
         country = findViewById(R.id.country_value)
         artwork = findViewById(R.id.artwork)
+        timing = findViewById(R.id.timing)
+        playButton = findViewById(R.id.play_button)
+
+        playButton.isEnabled = false
     }
 
-    private fun initToolbar() {
+    private fun initToolbarUI() {
         findViewById<Toolbar>(R.id.player_toolbar).let {
             title = ""
             setSupportActionBar(it)
 
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        }
+    }
+
+    private fun initPlayer() {
+        track?.let {
+            mediaPlayer.setDataSource(it.previewUrl)
+            mediaPlayer.prepareAsync()
+            mediaPlayer.setOnPreparedListener {
+                playButton.isEnabled = true
+                playerState = PlayerState.PREPARED
+            }
+            mediaPlayer.setOnCompletionListener {
+                playButton.setImageDrawable(resources.getDrawable(R.drawable.player_play))
+                playerState = PlayerState.PREPARED
+
+                handler.removeCallbacks(updatePlayTimingRunnable)
+
+                timing.setText("00:00")
+            }
+        }
+
+        playButton.setOnClickListener {
+            onPlayButtonClick()
         }
     }
 
@@ -105,7 +182,47 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
+    private fun startPlayer() {
+        mediaPlayer.start()
+
+        playButton.setImageDrawable(resources.getDrawable(R.drawable.player_pause))
+
+        playerState = PlayerState.PLAYING
+
+        handler.post(updatePlayTimingRunnable)
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+
+        playButton.setImageDrawable(resources.getDrawable(R.drawable.player_play))
+
+        playerState = PlayerState.PAUSED
+
+        handler.removeCallbacks(updatePlayTimingRunnable)
+    }
+
+    private fun onPlayButtonClick() {
+        when(playerState) {
+            PlayerState.PLAYING -> {
+                pausePlayer()
+            }
+            PlayerState.PREPARED, PlayerState.PAUSED -> {
+                startPlayer()
+            }
+            else -> {}
+        }
+    }
+
+    private fun updatePlayTiming() {
+        timing.setText(getTimingFromMS(mediaPlayer.currentPosition))
+    }
+
     companion object {
         const val TRACK_PARAM = "TRACK"
+
+        private fun getTimingFromMS(ms: Int): String {
+            return SimpleDateFormat("mm:ss", Locale.getDefault()).format(ms)
+        }
     }
 }
