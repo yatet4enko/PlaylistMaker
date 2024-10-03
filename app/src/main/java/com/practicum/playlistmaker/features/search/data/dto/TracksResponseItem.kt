@@ -10,4 +10,5 @@ data class TracksResponseItem(
     val primaryGenreName: String,
     val country: String,
     val collectionName: String? = null,
+    val previewUrl: String,
 )

@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -65,6 +67,12 @@ class SearchActivity : AppCompatActivity() {
         .build()
 
     private val gson = Gson()
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    private var isClickAllowed = true
+
+    private val searchTracksRunnable = Runnable { searchTracks() }
 
     private val tracksService = retrofit.create(TracksApi::class.java)
 
@@ -147,7 +155,7 @@ class SearchActivity : AppCompatActivity() {
         updateSearchIcons(withClose = false)
 
         updateButton.setOnClickListener {
-            searchTracks(searchEditText.text.toString())
+            searchTracks()
         }
 
         searchEditText.addTextChangedListener(object : TextWatcher {
@@ -161,6 +169,8 @@ class SearchActivity : AppCompatActivity() {
                 val isRecentTracksVisible = searchEditText.hasFocus() && searchValue.isEmpty() && recentTracks.isNotEmpty()
 
                 setRecentTracksVisible(isRecentTracksVisible)
+
+                searchTracksDebounced()
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -188,13 +198,13 @@ class SearchActivity : AppCompatActivity() {
             false
         })
 
-        searchEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                searchTracks(searchEditText.text.toString())
-                true
-            }
-            false
-        }
+//        searchEditText.setOnEditorActionListener { _, actionId, _ ->
+//            if (actionId == EditorInfo.IME_ACTION_DONE) {
+//                searchTracks(searchEditText.text.toString())
+//                true
+//            }
+//            false
+//        }
     }
 
 
@@ -293,7 +303,20 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
     private fun onTrackClick(track: Track) {
+        if (!clickDebounce()) {
+            return
+        }
+
         onChangeRecentTracks(recentTracksRepository.addRecentTrack(track))
 
         val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
@@ -303,11 +326,15 @@ class SearchActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun searchTracksDebounced() {
+        handler.removeCallbacks(searchTracksRunnable)
+        handler.postDelayed(searchTracksRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
 
-    private fun searchTracks(text: String) {
+    private fun searchTracks() {
         showLoadingState()
 
-        tracksService.searchTracks(text).enqueue(object : Callback<TracksResponse> {
+        tracksService.searchTracks(searchEditText.text.toString()).enqueue(object : Callback<TracksResponse> {
             override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
                 if (response.code() != 200) {
                     showErrorState()
@@ -398,6 +425,7 @@ class SearchActivity : AppCompatActivity() {
             year = extractYear(data.releaseDate),
             artworkUrl100 = data.artworkUrl100,
             collectionName = data.collectionName,
+            previewUrl = data.previewUrl,
         )
     }
 
@@ -414,5 +442,7 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         private const val SEARCH_VALUE_KEY = "SEARCH_VALUE_KEY"
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }

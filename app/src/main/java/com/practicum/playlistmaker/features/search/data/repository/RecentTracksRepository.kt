@@ -50,9 +50,15 @@ class RecentTracksRepository(
             return emptyList()
         }
 
-        val result = gson.fromJson(recentTracks, Array<Track>::class.java)
+        val parseResult = runCatching {
+            gson.fromJson(recentTracks, Array<Track>::class.java).toList()
+        }
 
-        return result.toList()
+        if (parseResult.isFailure) {
+            return emptyList()
+        }
+
+        return parseResult.getOrThrow()
     }
 
     private fun getSharedPreferences(context: Context): SharedPreferences {
