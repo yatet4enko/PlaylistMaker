@@ -19,7 +19,7 @@
             android:name=".features.player.ui.PlayerActivity"
             android:exported="false" />
         <activity
-            android:name=".MediaActivity"
+            android:name=".features.media.ui.MediaActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
@@ -36,7 +36,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".features.settings.ui.SettingsActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
     </application>

@@ -1,16 +1,15 @@
 package com.practicum.playlistmaker.features.player.ui
 
 import android.media.MediaPlayer
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.MenuItem
 import android.view.View.VISIBLE
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.Group
 import com.bumptech.glide.Glide
@@ -18,7 +17,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.gson.Gson
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.common.ui.dpToPx
-import com.practicum.playlistmaker.features.search.data.dto.Track
+import com.practicum.playlistmaker.features.search.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -170,7 +169,7 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    fun getCoverArtwork(track: Track) = track.artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
+    fun getCoverArtwork(trackDto: Track) = trackDto.artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
