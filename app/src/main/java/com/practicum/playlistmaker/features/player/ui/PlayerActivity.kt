@@ -15,8 +15,11 @@ import androidx.constraintlayout.widget.Group
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.gson.Gson
+import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.common.ui.dpToPx
+import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor
+import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor.PlayerConsumer
 import com.practicum.playlistmaker.features.search.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -29,7 +32,6 @@ enum class PlayerState {
 }
 
 class PlayerActivity : AppCompatActivity() {
-
     private val gson = Gson()
 
     private var track: Track? = null
@@ -49,8 +51,9 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var playButton: ImageButton
 
-    private var mediaPlayer = MediaPlayer()
     private var playerState = PlayerState.DEFAULT
+
+    private lateinit var playerInteractor: PlayerInteractor
 
     private val updatePlayTimingRunnable = object : Runnable {
         override fun run() {
@@ -63,6 +66,8 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
+
+        playerInteractor = (applicationContext as App).creator.providePlayerInteractor()
 
         initToolbarUI()
         initPlayerUI()
@@ -92,7 +97,7 @@ class PlayerActivity : AppCompatActivity() {
 
         pausePlayer()
 
-        mediaPlayer.release()
+        playerInteractor.release()
     }
 
     private fun initPlayerUI() {
@@ -123,20 +128,22 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun initPlayer() {
         track?.let {
-            mediaPlayer.setDataSource(it.previewUrl)
-            mediaPlayer.prepareAsync()
-            mediaPlayer.setOnPreparedListener {
-                playButton.isEnabled = true
-                playerState = PlayerState.PREPARED
-            }
-            mediaPlayer.setOnCompletionListener {
-                playButton.setImageDrawable(resources.getDrawable(R.drawable.player_play))
-                playerState = PlayerState.PREPARED
+            playerInteractor.prepare(it.previewUrl, object : PlayerConsumer {
+                override fun onPrepared() {
+                    playButton.isEnabled = true
+                    playerState = PlayerState.PREPARED
+                }
 
-                handler.removeCallbacks(updatePlayTimingRunnable)
+                override fun onCompletion() {
+                    playButton.setImageDrawable(resources.getDrawable(R.drawable.player_play))
+                    playerState = PlayerState.PREPARED
 
-                timing.setText("00:00")
-            }
+                    handler.removeCallbacks(updatePlayTimingRunnable)
+
+                    timing.setText("00:00")
+                }
+
+            })
         }
 
         playButton.setOnClickListener {
@@ -182,7 +189,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun startPlayer() {
-        mediaPlayer.start()
+        playerInteractor.start()
 
         playButton.setImageDrawable(resources.getDrawable(R.drawable.player_pause))
 
@@ -192,7 +199,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun pausePlayer() {
-        mediaPlayer.pause()
+        playerInteractor.pause()
 
         playButton.setImageDrawable(resources.getDrawable(R.drawable.player_play))
 
@@ -214,7 +221,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun updatePlayTiming() {
-        timing.setText(getTimingFromMS(mediaPlayer.currentPosition))
+        timing.setText(getTimingFromMS(playerInteractor.getCurrentTime()))
     }
 
     companion object {

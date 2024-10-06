@@ -1,7 +1,7 @@
 package com.practicum.playlistmaker.features.search.domain.api
 
-import com.practicum.playlistmaker.features.search.domain.models.Track
+import com.practicum.playlistmaker.features.search.domain.api.SearchTracksInteractor.TracksConsumer
 
 interface SearchTracksRepository {
-    fun search(text: String): List<Track>?
+    fun search(text: String, consumer: TracksConsumer)
 }

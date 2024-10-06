@@ -23,25 +23,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
+import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.features.player.ui.PlayerActivity
 import com.practicum.playlistmaker.features.player.ui.PlayerActivity.Companion.TRACK_PARAM
-import com.practicum.playlistmaker.features.search.Creator
-import com.practicum.playlistmaker.features.search.data.dto.TracksResponse
+import com.practicum.playlistmaker.Creator
+import com.practicum.playlistmaker.features.search.domain.api.RecentTracksInteractor
+import com.practicum.playlistmaker.features.search.domain.api.SearchTracksInteractor
 import com.practicum.playlistmaker.features.search.domain.api.SearchTracksInteractor.TracksConsumer
 import com.practicum.playlistmaker.features.search.domain.models.Track
-import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.Query
-
-interface TracksApi {
-    @GET("/search?entity=song")
-    fun searchTracks(@Query("term") text: String): Call<TracksResponse>
-}
 
 class SearchActivity : AppCompatActivity() {
-    private val recentTracksInteractor = Creator.provideRecentTracksInteractor(context = this)
-    private val searchTracksInteractor = Creator.provideSearchTracksInteractor()
+    private lateinit var recentTracksInteractor: RecentTracksInteractor
+    private lateinit var searchTracksInteractor: SearchTracksInteractor
 
     private val gson = Gson()
 
@@ -77,6 +71,9 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        recentTracksInteractor = (applicationContext as App).creator.provideRecentTracksInteractor()
+        searchTracksInteractor = (applicationContext as App).creator.provideSearchTracksInteractor()
 
         initToolbar()
         initSearch()
