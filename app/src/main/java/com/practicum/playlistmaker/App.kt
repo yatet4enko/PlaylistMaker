@@ -1,24 +1,27 @@
 package com.practicum.playlistmaker
 
 import android.app.Application
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
+import com.practicum.playlistmaker.features.settings.domain.api.SettingsInteractor
 
 class App: Application() {
 
-    var darkTheme = false
+    var creator = Creator(this)
 
-    var preferences: SharedPreferences? = null
+    private lateinit var settingsInteractor: SettingsInteractor
+
     override fun onCreate() {
         super.onCreate()
 
-        darkTheme = getSharedPreferences().getBoolean(SHARED_PREFERENCES_DARK_THEME_KEY, isDarkTheme())
+        settingsInteractor = (applicationContext as App).creator.provideSettingsInteractor()
 
-        switchTheme(darkTheme)
+        settingsInteractor.setDefaultIsDarkTheme(getSystemIsDarkTheme())
+
+        switchTheme(settingsInteractor.getIsDarkTheme())
     }
 
-    private fun isDarkTheme(): Boolean {
+    private fun getSystemIsDarkTheme(): Boolean {
         val nightModeFlags: Int = this.resources.configuration.uiMode and
                 Configuration.UI_MODE_NIGHT_MASK
 
@@ -28,12 +31,7 @@ class App: Application() {
         }
     }
     fun switchTheme(darkThemeEnabled: Boolean) {
-        darkTheme = darkThemeEnabled
-
-        getSharedPreferences()
-            .edit()
-            .putBoolean(SHARED_PREFERENCES_DARK_THEME_KEY, darkTheme)
-            .apply()
+        settingsInteractor.setIsDarkTheme(darkThemeEnabled)
 
         AppCompatDelegate.setDefaultNightMode(
             if (darkThemeEnabled) {
@@ -42,18 +40,5 @@ class App: Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
-    }
-
-    fun getSharedPreferences(): SharedPreferences {
-        if (preferences != null) {
-            return preferences!!
-        }
-
-        return getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE)
-    }
-
-    companion object {
-        private const val SHARED_PREFERENCES_NAME = "PLAYLIST_MAKER_SHARED_PREFERENCES"
-        private const val SHARED_PREFERENCES_DARK_THEME_KEY = "SHARED_PREFERENCES_DARK_THEME_KEY"
     }
 }

@@ -1,12 +1,12 @@
-package com.practicum.playlistmaker.features.search.data.repository
+package com.practicum.playlistmaker.features.search.data
 
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import com.practicum.playlistmaker.features.search.data.dto.Track
+import com.practicum.playlistmaker.features.search.data.dto.TrackDto
 
-class RecentTracksRepository(
+class RecentTracksDiskDataSource(
     private val context: Context,
 ) {
     var preferences: SharedPreferences? = null
@@ -20,12 +20,12 @@ class RecentTracksRepository(
             .apply()
     }
 
-    fun addRecentTrack(track: Track): List<Track> {
+    fun add(trackDto: TrackDto): List<TrackDto> {
         val recentTracks = getRecentTracks()
-            .filter { it.id != track.id }
+            .filter { it.id != trackDto.id }
             .toMutableList()
 
-        recentTracks.add(0, track)
+        recentTracks.add(0, trackDto)
 
         if (recentTracks.size > MAX_COUNT) {
             recentTracks.removeLast()
@@ -42,7 +42,7 @@ class RecentTracksRepository(
         return recentTracks
     }
 
-    fun getRecentTracks(): List<Track> {
+    fun getRecentTracks(): List<TrackDto> {
         val recentTracks = getSharedPreferences(context)
             .getString(SHARED_PREFERENCES_RECENT_TRACKS_KEY, "")
 
@@ -51,7 +51,7 @@ class RecentTracksRepository(
         }
 
         val parseResult = runCatching {
-            gson.fromJson(recentTracks, Array<Track>::class.java).toList()
+            gson.fromJson(recentTracks, Array<TrackDto>::class.java).toList()
         }
 
         if (parseResult.isFailure) {
