@@ -1,27 +1,33 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.features.settings.ui
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.FrameLayout
-import android.widget.Switch
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.practicum.playlistmaker.App
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.features.settings.domain.api.SettingsInteractor
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var themeSwitch: SwitchMaterial
 
+    private lateinit var settingsInteractor: SettingsInteractor
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        settingsInteractor = (applicationContext as App).creator.provideSettingsInteractor()
 
         setContentView(R.layout.activity_settings)
 
         themeSwitch = findViewById(R.id.theme_swith)
 
-        themeSwitch.isChecked = (applicationContext as App).darkTheme
+        themeSwitch.isChecked = settingsInteractor.getIsDarkTheme()
 
         themeSwitch.setOnCheckedChangeListener { switcher, isChecked ->
             (applicationContext as App).switchTheme(isChecked)

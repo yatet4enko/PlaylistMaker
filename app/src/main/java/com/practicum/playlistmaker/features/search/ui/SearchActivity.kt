@@ -3,68 +3,39 @@ package com.practicum.playlistmaker.features.search.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.OnTouchListener
 import android.view.View.VISIBLE
-import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.gson.Gson
+import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.common.ui.dpToPx
 import com.practicum.playlistmaker.features.player.ui.PlayerActivity
 import com.practicum.playlistmaker.features.player.ui.PlayerActivity.Companion.TRACK_PARAM
-import com.practicum.playlistmaker.features.search.data.dto.Track
-import com.practicum.playlistmaker.features.search.data.dto.TracksResponse
-import com.practicum.playlistmaker.features.search.data.dto.TracksResponseItem
-import com.practicum.playlistmaker.features.search.data.repository.RecentTracksRepository
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Query
-import java.text.SimpleDateFormat
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
-
-interface TracksApi {
-    @GET("/search?entity=song")
-    fun searchTracks(@Query("term") text: String): Call<TracksResponse>
-}
+import com.practicum.playlistmaker.Creator
+import com.practicum.playlistmaker.features.search.domain.api.RecentTracksInteractor
+import com.practicum.playlistmaker.features.search.domain.api.SearchTracksInteractor
+import com.practicum.playlistmaker.features.search.domain.api.SearchTracksInteractor.TracksConsumer
+import com.practicum.playlistmaker.features.search.domain.models.Track
 
 class SearchActivity : AppCompatActivity() {
-    private val recentTracksRepository = RecentTracksRepository(this)
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://itunes.apple.com")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    private lateinit var recentTracksInteractor: RecentTracksInteractor
+    private lateinit var searchTracksInteractor: SearchTracksInteractor
 
     private val gson = Gson()
 
@@ -74,10 +45,10 @@ class SearchActivity : AppCompatActivity() {
 
     private val searchTracksRunnable = Runnable { searchTracks() }
 
-    private val tracksService = retrofit.create(TracksApi::class.java)
-
     private val tracks = ArrayList<Track>()
-    private val tracksAdapter = SearchResultsAdapter(tracks)
+    private val tracksAdapter = SearchResultsAdapter(tracks) { track ->
+        onTrackClick(track)
+    }
 
     private lateinit var recentTracks: ArrayList<Track>
     private lateinit var recentTracksAdapter:  SearchResultsAdapter
@@ -101,6 +72,9 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
+        recentTracksInteractor = (applicationContext as App).creator.provideRecentTracksInteractor()
+        searchTracksInteractor = (applicationContext as App).creator.provideSearchTracksInteractor()
+
         initToolbar()
         initSearch()
         initSearchResults()
@@ -118,22 +92,6 @@ class SearchActivity : AppCompatActivity() {
 
         searchEditText.setText(searchValue)
     }
-
-//    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-//        if (ev.action == MotionEvent.ACTION_DOWN) {
-//            val v = currentFocus
-//            if (v is EditText) {
-//                val outRect = Rect()
-//                v.getGlobalVisibleRect(outRect)
-//                if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
-//                    v.clearFocus()
-//                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//                    imm.hideSoftInputFromWindow(v.windowToken, 0)
-//                }
-//            }
-//        }
-//        return super.dispatchTouchEvent(ev)
-//    }
 
     private fun initToolbar() {
         findViewById<Toolbar>(R.id.toolbar).let {
@@ -197,14 +155,6 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         })
-
-//        searchEditText.setOnEditorActionListener { _, actionId, _ ->
-//            if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                searchTracks(searchEditText.text.toString())
-//                true
-//            }
-//            false
-//        }
     }
 
 
@@ -236,8 +186,10 @@ class SearchActivity : AppCompatActivity() {
     private fun initSearchRecent() {
         clearRecentButton = findViewById(R.id.clear_recent)
 
-        recentTracks = ArrayList(recentTracksRepository.getRecentTracks())
-        recentTracksAdapter = SearchResultsAdapter(recentTracks)
+        recentTracks = ArrayList(recentTracksInteractor.getRecentTracks())
+        recentTracksAdapter = SearchResultsAdapter(recentTracks) { track ->
+            onTrackClick(track)
+        }
 
         recentTracksView = findViewById(R.id.recent_tracks)
 
@@ -246,60 +198,11 @@ class SearchActivity : AppCompatActivity() {
         recentTracksItems.adapter = recentTracksAdapter
 
         clearRecentButton.setOnClickListener {
-            recentTracksRepository.clear()
+            recentTracksInteractor.clear()
 
             onChangeRecentTracks(emptyList())
 
             setRecentTracksVisible(false)
-        }
-    }
-
-    inner class SearchResultsAdapter(
-        private val tracks: List<Track>,
-    ): RecyclerView.Adapter<SearchResultsAdapter.SearchResultsItemViewHolder>() {
-        override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int
-        ): SearchResultsItemViewHolder {
-            val view = LayoutInflater
-                .from(parent.context)
-                .inflate(R.layout.track_view, parent, false)
-
-            return SearchResultsItemViewHolder(view)
-        }
-
-        override fun getItemCount(): Int {
-            return tracks.size
-        }
-
-        override fun onBindViewHolder(holder: SearchResultsItemViewHolder, position: Int) {
-            holder.bind(tracks[position])
-        }
-
-        inner class SearchResultsItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-            private val artwork: ImageView = itemView.findViewById(R.id.track_artwork)
-            private val title: TextView = itemView.findViewById(R.id.track_title)
-            private val artist: TextView = itemView.findViewById(R.id.track_artist)
-            private val duration: TextView = itemView.findViewById(R.id.track_duration)
-
-            fun bind(track: Track) {
-                title.text = track.trackName
-                artist.text = "${track.artistName}"
-                duration.text = "  •  ${track.trackTime}"
-
-                itemView.setOnClickListener {
-                    onTrackClick(track)
-                }
-
-                Glide
-                    .with(itemView)
-                    .load(track.artworkUrl100)
-                    .placeholder(R.drawable.track_placeholder)
-                    .error(R.drawable.track_placeholder)
-                    .fitCenter()
-                    .transform(RoundedCorners(dpToPx(2F, itemView.context)))
-                    .into(artwork)
-            }
         }
     }
 
@@ -317,7 +220,7 @@ class SearchActivity : AppCompatActivity() {
             return
         }
 
-        onChangeRecentTracks(recentTracksRepository.addRecentTrack(track))
+        onChangeRecentTracks(recentTracksInteractor.add(track))
 
         val intent = Intent(this@SearchActivity, PlayerActivity::class.java)
 
@@ -334,29 +237,26 @@ class SearchActivity : AppCompatActivity() {
     private fun searchTracks() {
         showLoadingState()
 
-        tracksService.searchTracks(searchEditText.text.toString()).enqueue(object : Callback<TracksResponse> {
-            override fun onResponse(call: Call<TracksResponse>, response: Response<TracksResponse>) {
-                if (response.code() != 200) {
-                    showErrorState()
+        searchTracksInteractor.search(searchEditText.text.toString(), object : TracksConsumer {
+            override fun consume(foundTracks: List<Track>?) {
+                if (foundTracks == null) {
+                    runOnUiThread {
+                        showErrorState()
+                    }
                     return
                 }
 
-                val results = response.body()?.results
-                if (results?.isNotEmpty() == true) {
-                    val formattedTracks = results.map {
-                        formatTrack(it)
+                if (foundTracks.isEmpty()) {
+                    runOnUiThread {
+                        showEmptyState()
                     }
+                    return
+                }
 
-                    showSearchResults(formattedTracks)
-                } else {
-                    showEmptyState()
+                runOnUiThread {
+                    showSearchResults(foundTracks)
                 }
             }
-
-            override fun onFailure(call: Call<TracksResponse>, t: Throwable) {
-                showErrorState()
-            }
-
         })
     }
 
@@ -409,35 +309,6 @@ class SearchActivity : AppCompatActivity() {
         searchResults.visibility = INVISIBLE
         notFoundView.visibility = INVISIBLE
         errorView.visibility = INVISIBLE
-    }
-
-    private fun formatTrack(data: TracksResponseItem): Track {
-        val trackTime = SimpleDateFormat("mm:ss", Locale.getDefault())
-            .format(data.trackTimeMillis)
-
-        return Track(
-            id = data.trackId,
-            trackName = data.trackName,
-            artistName = data.artistName,
-            trackTime = trackTime,
-            country = data.country,
-            primaryGenreName = data.primaryGenreName,
-            year = extractYear(data.releaseDate),
-            artworkUrl100 = data.artworkUrl100,
-            collectionName = data.collectionName,
-            previewUrl = data.previewUrl,
-        )
-    }
-
-    private fun extractYear(dateTimeString: String): Int {
-        // Define the formatter for the given date-time string
-        val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-
-        // Parse the string to an OffsetDateTime object
-        val dateTime = OffsetDateTime.parse(dateTimeString, formatter)
-
-        // Extract the year
-        return dateTime.year
     }
 
     companion object {
