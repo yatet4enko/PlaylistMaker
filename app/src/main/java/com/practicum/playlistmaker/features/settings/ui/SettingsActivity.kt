@@ -5,32 +5,30 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.features.settings.domain.api.SettingsInteractor
+import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
 
 class SettingsActivity : AppCompatActivity() {
+    private val viewModel by viewModels<SettingsViewModel> { SettingsViewModel.getViewModelFactory() }
 
-    private lateinit var themeSwitch: SwitchMaterial
-
-    private lateinit var settingsInteractor: SettingsInteractor
+    private lateinit var binding: ActivitySettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        settingsInteractor = (applicationContext as App).creator.provideSettingsInteractor()
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
 
-        setContentView(R.layout.activity_settings)
+        setContentView(binding.root)
 
-        themeSwitch = findViewById(R.id.theme_swith)
+        viewModel.settingsState.observe(this) {
+            binding.themeSwitch.isChecked = it.isDarkTheme
+        }
 
-        themeSwitch.isChecked = settingsInteractor.getIsDarkTheme()
-
-        themeSwitch.setOnCheckedChangeListener { switcher, isChecked ->
-            (applicationContext as App).switchTheme(isChecked)
+        binding.themeSwitch.setOnCheckedChangeListener { switcher, isChecked ->
+            viewModel.onDarkThemeSwitch(isChecked)
         }
 
         findViewById<Toolbar>(R.id.toolbar).let {
