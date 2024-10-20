@@ -19,7 +19,7 @@ import com.practicum.playlistmaker.features.search.domain.models.Track
 class PlayerActivity : AppCompatActivity() {
     private val viewModel by viewModels<PlayerViewModel> { PlayerViewModel.getViewModelFactory() }
 
-    private lateinit var binding: ActivityPlayerBinding
+    private var binding: ActivityPlayerBinding? = null
 
     private val gson = Gson()
 
@@ -29,7 +29,7 @@ class PlayerActivity : AppCompatActivity() {
 
         binding = ActivityPlayerBinding.inflate(layoutInflater)
 
-        setContentView(binding.root)
+        setContentView(binding?.root)
 
         initToolbarUI()
 
@@ -38,13 +38,13 @@ class PlayerActivity : AppCompatActivity() {
                 fulfillPlayer(it)
             }
 
-            binding.playButton.isEnabled = state.state != PlayerState.DEFAULT
+            binding?.playButton?.isEnabled = state.state != PlayerState.DEFAULT
 
-            binding.playButton.setImageDrawable(resources.getDrawable(
+            binding?.playButton?.setImageDrawable(resources.getDrawable(
                 if (state.state == PlayerState.PLAYING) R.drawable.player_pause else R.drawable.player_play
             ))
 
-            binding.timing.text = state.timing
+            binding?.timing?.text = state.timing
         }
 
         try {
@@ -56,7 +56,7 @@ class PlayerActivity : AppCompatActivity() {
             viewModel.initialize(it)
         }
 
-        binding.playButton.setOnClickListener {
+        binding?.playButton?.setOnClickListener {
             viewModel.onPlayButtonClick()
         }
     }
@@ -78,31 +78,35 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun fulfillPlayer(track: Track) {
-        binding.trackName.text = track.trackName
-        binding.artistName.text = track.artistName
-        binding.durationValue.text = track.trackTime
-        binding.yearValue.text = track.year.toString()
-        binding.genreValue.text = track.primaryGenreName
-        binding.countryValue.text = track.country
+        binding?.trackName?.text = track.trackName
+        binding?.artistName?.text = track.artistName
+        binding?.durationValue?.text = track.trackTime
+        binding?.yearValue?.text = track.year.toString()
+        binding?.genreValue?.text = track.primaryGenreName
+        binding?.countryValue?.text = track.country
 
         if (!track.collectionName.isNullOrEmpty()) {
-            binding.albumValue.text = track.collectionName
-            binding.albumGroup.visibility = VISIBLE
+            binding?.albumValue?.text = track.collectionName
+            binding?.albumGroup?.visibility = VISIBLE
         }
 
         if (track.artworkUrl100.isNotEmpty()) {
-            Glide
-                .with(this)
-                .load(getCoverArtwork(track))
-                .placeholder(R.drawable.track_placeholder)
-                .error(R.drawable.track_placeholder)
-                .fitCenter()
-                .transform(RoundedCorners(dpToPx(8F, this)))
-                .into(binding.artwork)
+            binding?.artwork?.let {
+                Glide
+                    .with(this)
+                    .load(getCoverArtwork(track))
+                    .placeholder(R.drawable.track_placeholder)
+                    .error(R.drawable.track_placeholder)
+                    .fitCenter()
+                    .transform(RoundedCorners(dpToPx(8F, this)))
+                    .into(it)
+            }
         }
     }
 
-    private fun getCoverArtwork(trackDto: Track) = trackDto.artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
+    private fun getCoverArtwork(trackDto: Track): String {
+        return trackDto.artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {

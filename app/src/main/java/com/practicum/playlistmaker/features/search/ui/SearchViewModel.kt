@@ -110,7 +110,7 @@ class SearchViewModel(application: Application): AndroidViewModel(application) {
 
     private fun searchTracksDebounced() {
         handler.removeCallbacks(searchTracksRunnable)
-        handler.postDelayed(searchTracksRunnable, SEARCH_DEBOUNCE_DELAY)
+        handler.postDelayed(searchTracksRunnable, SEARCH_DEBOUNCE_DELAY_MS)
     }
 
     private fun searchTracks() {
@@ -143,7 +143,7 @@ class SearchViewModel(application: Application): AndroidViewModel(application) {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY_MS)
         }
         return current
     }
@@ -160,7 +160,7 @@ class SearchViewModel(application: Application): AndroidViewModel(application) {
             }
         }
 
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY_MS = 2000L
+        private const val CLICK_DEBOUNCE_DELAY_MS = 1000L
     }
 }
