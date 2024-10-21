@@ -10,9 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
+import com.practicum.playlistmaker.features.player.ui.PlayerViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
-    private val viewModel by viewModels<SettingsViewModel> { SettingsViewModel.getViewModelFactory() }
+    private val viewModel by viewModel<SettingsViewModel>()
 
     private lateinit var binding: ActivitySettingsBinding
 
