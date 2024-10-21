@@ -6,14 +6,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View.INVISIBLE
 import android.view.View.OnTouchListener
 import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.practicum.playlistmaker.R
@@ -22,18 +20,17 @@ import com.practicum.playlistmaker.features.player.ui.PlayerActivity
 import com.practicum.playlistmaker.features.player.ui.PlayerActivity.Companion.TRACK_PARAM
 import com.practicum.playlistmaker.features.search.domain.models.Track
 import com.practicum.playlistmaker.features.search.ui.models.SearchContentStateVO
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
-    private val viewModel by viewModels<SearchViewModel> { SearchViewModel.getViewModelFactory() }
+    private val viewModel by viewModel<SearchViewModel>()
 
     private lateinit var binding: ActivitySearchBinding
 
     private val tracksAdapter = SearchResultsAdapter {
-        Log.i("GGWP", "B1")
         viewModel.onTrackClick(it)
     }
     private val recentTracksAdapter = SearchResultsAdapter {
-        Log.i("GGWP", "A1")
         viewModel.onTrackClick(it)
     }
 

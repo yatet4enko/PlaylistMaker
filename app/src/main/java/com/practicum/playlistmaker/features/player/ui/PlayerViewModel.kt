@@ -6,11 +6,7 @@ import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistmaker.App
+import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor
 import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor.PlayerConsumer
 import com.practicum.playlistmaker.features.player.ui.models.PlayerState
 import com.practicum.playlistmaker.features.player.ui.models.PlayerStateVO
@@ -18,8 +14,10 @@ import com.practicum.playlistmaker.features.search.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerViewModel(application: Application): AndroidViewModel(application) {
-    private val playerInteractor = getApplication<App>().creator.providePlayerInteractor()
+class PlayerViewModel(
+    application: Application,
+    private val playerInteractor: PlayerInteractor
+): AndroidViewModel(application) {
 
     private val playerStateLiveData = MutableLiveData(DEFAULT_STATE)
     val playerState: LiveData<PlayerStateVO> = playerStateLiveData
@@ -121,12 +119,6 @@ class PlayerViewModel(application: Application): AndroidViewModel(application) {
     }
 
     companion object {
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                PlayerViewModel(this[APPLICATION_KEY] as Application)
-            }
-        }
-
         private const val DEFAULT_TIMING = "00:00"
 
         private val DEFAULT_STATE = PlayerStateVO(

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View.VISIBLE
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.bumptech.glide.Glide
@@ -15,9 +14,10 @@ import com.practicum.playlistmaker.common.ui.dpToPx
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
 import com.practicum.playlistmaker.features.player.ui.models.PlayerState
 import com.practicum.playlistmaker.features.search.domain.models.Track
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
-    private val viewModel by viewModels<PlayerViewModel> { PlayerViewModel.getViewModelFactory() }
+    private val viewModel by viewModel<PlayerViewModel>()
 
     private var binding: ActivityPlayerBinding? = null
 

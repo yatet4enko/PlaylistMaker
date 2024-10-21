@@ -6,20 +6,18 @@ import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistmaker.App
 import com.practicum.playlistmaker.common.ui.SingleLiveEvent
+import com.practicum.playlistmaker.features.search.domain.api.RecentTracksInteractor
+import com.practicum.playlistmaker.features.search.domain.api.SearchTracksInteractor
 import com.practicum.playlistmaker.features.search.domain.api.SearchTracksInteractor.TracksConsumer
 import com.practicum.playlistmaker.features.search.domain.models.Track
 import com.practicum.playlistmaker.features.search.ui.models.SearchContentStateVO
 
-class SearchViewModel(application: Application): AndroidViewModel(application) {
-    private val recentTracksInteractor = getApplication<App>().creator.provideRecentTracksInteractor()
-    private val searchTracksInteractor = getApplication<App>().creator.provideSearchTracksInteractor()
-
+class SearchViewModel(
+    application: Application,
+    private val recentTracksInteractor: RecentTracksInteractor,
+    private val searchTracksInteractor: SearchTracksInteractor,
+): AndroidViewModel(application) {
     private val recentTracks = ArrayList<Track>()
     private var isSearchFocused = false
 
@@ -154,12 +152,6 @@ class SearchViewModel(application: Application): AndroidViewModel(application) {
     }
 
     companion object {
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SearchViewModel(this[APPLICATION_KEY] as Application)
-            }
-        }
-
         private const val SEARCH_DEBOUNCE_DELAY_MS = 2000L
         private const val CLICK_DEBOUNCE_DELAY_MS = 1000L
     }
