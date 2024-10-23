@@ -4,8 +4,9 @@ import android.media.MediaPlayer
 import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor
 import com.practicum.playlistmaker.features.player.domain.api.PlayerRepository
 
-class PlayerRepositoryImpl: PlayerRepository {
-    private var mediaPlayer = MediaPlayer()
+    class PlayerRepositoryImpl(
+    private val mediaPlayer: MediaPlayer,
+): PlayerRepository {
 
     override fun prepare(url: String, consumer: PlayerInteractor.PlayerConsumer) {
         mediaPlayer.setDataSource(url)
