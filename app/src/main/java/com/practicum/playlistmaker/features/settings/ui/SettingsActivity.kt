@@ -5,12 +5,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
-import com.practicum.playlistmaker.features.player.ui.PlayerViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
@@ -25,9 +23,7 @@ class SettingsActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        viewModel.settingsState.observe(this) {
-            binding.themeSwitch.isChecked = it.isDarkTheme
-        }
+        binding.themeSwitch.isChecked = viewModel.settingsState.value?.isDarkTheme == true
 
         binding.themeSwitch.setOnCheckedChangeListener { switcher, isChecked ->
             viewModel.onDarkThemeSwitch(isChecked)

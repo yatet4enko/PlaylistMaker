@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.features.search.data
 
+import android.util.Log
 import com.practicum.playlistmaker.features.search.data.dto.TracksResponse
 import com.practicum.playlistmaker.features.search.data.dto.TracksResponseItem
 import com.practicum.playlistmaker.features.search.domain.models.Track
@@ -15,7 +16,11 @@ class SearchTracksRemoteDataSource(
     private val tracksService: TracksApi,
 ) {
     fun getSearchResults(text: String): List<Track>? {
-        val response = tracksService.searchTracks(text).execute()
+        val response = try {
+            tracksService.searchTracks(text).execute()
+        } catch(e: Exception) {
+            return null
+        }
 
         if (response.code() != 200) {
             return null

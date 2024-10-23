@@ -4,7 +4,7 @@ import android.media.MediaPlayer
 import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor
 import com.practicum.playlistmaker.features.player.domain.api.PlayerRepository
 
-class PlayerRepositoryImpl(
+    class PlayerRepositoryImpl(
     private val mediaPlayer: MediaPlayer,
 ): PlayerRepository {
 

@@ -24,6 +24,8 @@ class PlayerViewModel(
 
     private val handler = Handler(Looper.getMainLooper())
 
+    private var isInitialized = false
+
     private val updatePlayTimingRunnable = object : Runnable {
         override fun run() {
             updatePlayTiming()
@@ -43,21 +45,25 @@ class PlayerViewModel(
     }
 
     fun initialize(track: Track) {
-        val currentState = playerStateLiveData.value ?: DEFAULT_STATE
+        if (isInitialized) {
+            return
+        }
 
-        playerStateLiveData.postValue(currentState.copy(
+        isInitialized = true
+
+        playerStateLiveData.postValue(getCurrentState().copy(
             track = track,
         ))
 
         playerInteractor.prepare(track.previewUrl, object : PlayerConsumer {
             override fun onPrepared() {
-                playerStateLiveData.postValue(currentState.copy(
+                playerStateLiveData.postValue(getCurrentState().copy(
                     state = PlayerState.PREPARED,
                 ))
             }
 
             override fun onCompletion() {
-                playerStateLiveData.postValue(currentState.copy(
+                playerStateLiveData.postValue(getCurrentState().copy(
                     state = PlayerState.PREPARED,
                     timing = DEFAULT_TIMING,
                 ))
@@ -84,6 +90,10 @@ class PlayerViewModel(
 
     fun onStop() {
         pausePlayer()
+    }
+
+    private fun getCurrentState(): PlayerStateVO {
+        return playerStateLiveData.value ?: DEFAULT_STATE
     }
 
     private fun startPlayer() {
