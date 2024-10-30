@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_top_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="100dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_top_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="100dp" />
+
+    <ImageView
+        android:id="@+id/not_found_image"
+        android:src="@drawable/not_found"
+        android:layout_marginTop="120dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="120dp"
+        android:layout_height="120dp" />
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        app:layout_constraintStart_toStartOf="@id/left_top_guideline"
+        app:layout_constraintEnd_toEndOf="@id/right_top_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/not_found_image"
+        android:layout_marginTop="@dimen/space_xl"
+        android:text="@string/playlists_empty"
+        android:textAlignment="center"
+        style="@style/SearchErrorStyle" />
+
+    <Button
+        android:id="@+id/clear_recent"
+        app:layout_constraintStart_toStartOf="@id/left_top_guideline"
+        app:layout_constraintEnd_toEndOf="@id/right_top_guideline"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_xxl"
+        android:text="@string/new_playlist"
+        android:textSize="@dimen/text_size_s"
+        android:textColor="?attr/colorPrimarySurface"
+        android:backgroundTint="?attr/colorPrimary"
+        android:fontFamily="@font/ys_display_medium"
+        android:paddingVertical="6dp"
+        android:paddingHorizontal="8dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
