@@ -1,31 +1,33 @@
 package com.practicum.playlistmaker.features.search.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import android.view.View.INVISIBLE
-import android.view.View.OnTouchListener
 import android.view.View.VISIBLE
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ActivitySearchBinding
+import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.features.player.ui.PlayerActivity
 import com.practicum.playlistmaker.features.player.ui.PlayerActivity.Companion.TRACK_PARAM
 import com.practicum.playlistmaker.features.search.domain.models.Track
 import com.practicum.playlistmaker.features.search.ui.models.SearchContentStateVO
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
+
     private val viewModel by viewModel<SearchViewModel>()
 
-    private lateinit var binding: ActivitySearchBinding
+    private lateinit var binding: FragmentSearchBinding
 
     private val tracksAdapter = SearchResultsAdapter {
         viewModel.onTrackClick(it)
@@ -36,46 +38,48 @@ class SearchActivity : AppCompatActivity() {
 
     private val gson = Gson()
 
-    @SuppressLint("UseCompatLoadingForDrawables")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        binding = ActivitySearchBinding.inflate(layoutInflater)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        setContentView(binding.root)
-
-        viewModel.contentState.observe(this) {
+        viewModel.contentState.observe(viewLifecycleOwner) {
             renderContent(it)
         }
 
-        viewModel.text.observe(this) {
+        viewModel.text.observe(viewLifecycleOwner) {
             val withClose = it.isNotEmpty()
 
             binding.searchEditText.setCompoundDrawablesWithIntrinsicBounds(
-                getDrawable(R.drawable.search_icon),
+                requireContext().getDrawable(R.drawable.search_icon),
                 null,
-                if (withClose) getDrawable(R.drawable.close) else null,
+                if (withClose) requireContext().getDrawable(R.drawable.close) else null,
                 null
             )
         }
 
-        viewModel.observeClearSearchInput().observe(this) {
+        viewModel.observeClearSearchInput().observe(viewLifecycleOwner) {
             binding.searchEditText.setText("")
         }
 
-        viewModel.observeNavigateTrack().observe(this) {
-            val intent = Intent(this, PlayerActivity::class.java)
+        viewModel.observeNavigateTrack().observe(viewLifecycleOwner) {
+            val intent = Intent(requireContext(), PlayerActivity::class.java)
 
             intent.putExtra(TRACK_PARAM, gson.toJson(it))
 
             startActivity(intent)
         }
 
-        viewModel.observeHideKeyboard().observe(this) {
+        viewModel.observeHideKeyboard().observe(viewLifecycleOwner) {
             hideKeyboard()
         }
 
-        initToolbar()
         initSearch()
         initSearchResults()
         initSearchRecent()
@@ -89,17 +93,6 @@ class SearchActivity : AppCompatActivity() {
             is SearchContentStateVO.Error -> showErrorState()
             is SearchContentStateVO.Success -> showSearchResults(state.tracks)
             is SearchContentStateVO.Recent -> showRecentTracks(state.tracks)
-        }
-    }
-
-    private fun initToolbar() {
-        binding.toolbar.let {
-            title = ""
-            setSupportActionBar(it)
-            title = resources.getString(R.string.search)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
     }
 
@@ -122,7 +115,7 @@ class SearchActivity : AppCompatActivity() {
             viewModel.onSearhcFocusChange(hasFocus)
         }
 
-        binding.searchEditText.setOnTouchListener(OnTouchListener { v, event ->
+        binding.searchEditText.setOnTouchListener(View.OnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 val textView = v as TextView
                 if (event.x >= textView.width - textView.compoundPaddingEnd) {
@@ -141,7 +134,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideKeyboard() {
-        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         inputMethodManager?.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
     }
 

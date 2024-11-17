@@ -8,6 +8,7 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         style="@style/ToolbarStyle"
+        app:title="@string/media"
         android:layout_marginBottom="0dp" />
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
