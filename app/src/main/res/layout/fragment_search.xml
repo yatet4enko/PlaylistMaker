@@ -7,6 +7,7 @@
     android:background="?attr/colorPrimarySurface">
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
+        app:title="@string/search"
         style="@style/ToolbarStyle"/>
     <EditText
         android:theme="@style/Theme.SearchEditText"

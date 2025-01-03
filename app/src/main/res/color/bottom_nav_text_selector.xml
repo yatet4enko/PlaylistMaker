@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Цвет текста для активного (выбранного) элемента -->
+    <item android:color="@color/blue" android:state_checked="true" />
+    <!-- Цвет текста для неактивного (обычного) элемента -->
+    <item android:color="?attr/colorPrimary" android:state_checked="false" />
+</selector>

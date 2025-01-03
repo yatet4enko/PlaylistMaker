@@ -3,25 +3,30 @@ package com.practicum.playlistmaker.features.settings.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.FrameLayout
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
+import com.practicum.playlistmaker.databinding.FragmentSettingsBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsFragment : Fragment() {
     private val viewModel by viewModel<SettingsViewModel>()
 
-    private lateinit var binding: ActivitySettingsBinding
+    private lateinit var binding: FragmentSettingsBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-
-        setContentView(binding.root)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.themeSwitch.isChecked = viewModel.settingsState.value?.isDarkTheme == true
 
@@ -29,16 +34,7 @@ class SettingsActivity : AppCompatActivity() {
             viewModel.onDarkThemeSwitch(isChecked)
         }
 
-        findViewById<Toolbar>(R.id.toolbar).let {
-            title = ""
-            setSupportActionBar(it)
-            title = getString(R.string.settings)
-
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        }
-
-        findViewById<FrameLayout>(R.id.share_app).setOnClickListener {
+        binding.shareApp.setOnClickListener {
             val intent = Intent(Intent.ACTION_SEND)
             intent.putExtra(Intent.EXTRA_TEXT, PRACTICUM_URL);
             intent.setType("text/plain");
@@ -49,14 +45,14 @@ class SettingsActivity : AppCompatActivity() {
 
             result.onFailure {
                 Toast.makeText(
-                    this,
+                    requireContext(),
                     getString(R.string.open_messenger_error),
                     Toast.LENGTH_LONG,
                 ).show();
             }
         }
 
-        findViewById<FrameLayout>(R.id.write_to_support).setOnClickListener {
+        binding.writeToSupport.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
 
@@ -68,7 +64,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        findViewById<FrameLayout>(R.id.user_aggrement).setOnClickListener {
+        binding.userAggrement.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(USER_AGGREMENT_URL))
 
             startActivity(intent)
