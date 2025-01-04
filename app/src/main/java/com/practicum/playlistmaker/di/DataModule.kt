@@ -62,7 +62,7 @@ val dataModule = module {
     }
 
     single<SearchTracksRepository> {
-        SearchTracksRepositoryImpl(get(), get())
+        SearchTracksRepositoryImpl(get())
     }
 
     // Player

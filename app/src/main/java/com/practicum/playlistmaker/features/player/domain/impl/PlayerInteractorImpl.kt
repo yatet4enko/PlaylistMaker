@@ -22,6 +22,10 @@ class PlayerInteractorImpl(
         playerRepository.release()
     }
 
+    override fun isPlaying(): Boolean {
+        return playerRepository.isPlaying()
+    }
+
     override fun getCurrentTime(): Int {
         return playerRepository.getCurrentTime()
     }

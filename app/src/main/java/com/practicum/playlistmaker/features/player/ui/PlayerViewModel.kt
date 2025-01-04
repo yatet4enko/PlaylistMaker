@@ -1,16 +1,20 @@
 package com.practicum.playlistmaker.features.player.ui
 
 import android.app.Application
-import android.os.Handler
-import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor
 import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor.PlayerConsumer
 import com.practicum.playlistmaker.features.player.ui.models.PlayerState
 import com.practicum.playlistmaker.features.player.ui.models.PlayerStateVO
 import com.practicum.playlistmaker.features.search.domain.models.Track
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -22,22 +26,12 @@ class PlayerViewModel(
     private val playerStateLiveData = MutableLiveData(DEFAULT_STATE)
     val playerState: LiveData<PlayerStateVO> = playerStateLiveData
 
-    private val handler = Handler(Looper.getMainLooper())
-
     private var isInitialized = false
 
-    private val updatePlayTimingRunnable = object : Runnable {
-        override fun run() {
-            updatePlayTiming()
-
-            handler.postDelayed(this, 300)
-        }
-    }
+    private var updateTimingJob: Job? = null
 
     override fun onCleared() {
         super.onCleared()
-
-        handler.removeCallbacks(updatePlayTimingRunnable)
 
         pausePlayer()
 
@@ -58,17 +52,14 @@ class PlayerViewModel(
         playerInteractor.prepare(track.previewUrl, object : PlayerConsumer {
             override fun onPrepared() {
                 playerStateLiveData.postValue(getCurrentState().copy(
-                    state = PlayerState.PREPARED,
+                    state = PlayerState.Prepared(),
                 ))
             }
 
             override fun onCompletion() {
                 playerStateLiveData.postValue(getCurrentState().copy(
-                    state = PlayerState.PREPARED,
-                    timing = DEFAULT_TIMING,
+                    state = PlayerState.Prepared(),
                 ))
-
-                handler.removeCallbacks(updatePlayTimingRunnable)
             }
 
         })
@@ -78,10 +69,10 @@ class PlayerViewModel(
         val currentState = (playerState.value ?: DEFAULT_STATE).state
 
         when(currentState) {
-            PlayerState.PLAYING -> {
+            is PlayerState.Playing -> {
                 pausePlayer()
             }
-            PlayerState.PREPARED, PlayerState.PAUSED -> {
+            is PlayerState.Prepared, is PlayerState.Paused -> {
                 startPlayer()
             }
             else -> {}
@@ -102,10 +93,10 @@ class PlayerViewModel(
         playerInteractor.start()
 
         playerStateLiveData.postValue(currentState.copy(
-            state = PlayerState.PLAYING,
+            state = PlayerState.Playing(getCurrentPlayerPosition()),
         ))
 
-        handler.post(updatePlayTimingRunnable)
+        startUpdatePlayTiming()
     }
 
     private fun pausePlayer() {
@@ -114,31 +105,44 @@ class PlayerViewModel(
         playerInteractor.pause()
 
         playerStateLiveData.postValue(currentState.copy(
-            state = PlayerState.PAUSED,
+            state = PlayerState.Paused(getCurrentPlayerPosition()),
         ))
 
-        handler.removeCallbacks(updatePlayTimingRunnable)
+        stopUpdatePlayTiming()
+    }
+
+    private fun startUpdatePlayTiming() {
+        updateTimingJob = viewModelScope.launch {
+            while (playerInteractor.isPlaying()) {
+                updatePlayTiming()
+
+                Log.i("GGWP", "111")
+
+                delay(300)
+            }
+        }
+    }
+
+    private fun stopUpdatePlayTiming() {
+        updateTimingJob?.cancel()
     }
 
     private fun updatePlayTiming() {
         val currentState = playerStateLiveData.value ?: DEFAULT_STATE
 
         playerStateLiveData.postValue(currentState.copy(
-            timing = getTimingFromMS(playerInteractor.getCurrentTime())
+            state = PlayerState.Playing(getCurrentPlayerPosition()),
         ))
     }
 
-    companion object {
-        private const val DEFAULT_TIMING = "00:00"
+    private fun getCurrentPlayerPosition(): String {
+        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(playerInteractor.getCurrentTime()) ?: "00:00"
+    }
 
+    companion object {
         private val DEFAULT_STATE = PlayerStateVO(
             track = null,
-            state = PlayerState.DEFAULT,
-            timing = DEFAULT_TIMING,
+            state = PlayerState.Default(),
         )
-
-        private fun getTimingFromMS(ms: Int): String {
-            return SimpleDateFormat("mm:ss", Locale.getDefault()).format(ms)
-        }
     }
 }

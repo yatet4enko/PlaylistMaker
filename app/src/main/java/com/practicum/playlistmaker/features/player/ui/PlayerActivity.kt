@@ -2,6 +2,7 @@ package com.practicum.playlistmaker.features.player.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
@@ -69,6 +70,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun fulfillPlayer(state: PlayerStateVO) {
+        Log.i("GGWP", "fulfillPlayer ${state}")
         state.track?.let { track ->
             binding?.trackName?.text = track.trackName
             binding?.artistName?.text = track.artistName
@@ -96,13 +98,13 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
 
-        binding?.playButton?.isEnabled = state.state != PlayerState.DEFAULT
+        binding?.playButton?.isEnabled = state.state !is PlayerState.Default
 
         binding?.playButton?.setImageDrawable(resources.getDrawable(
-            if (state.state == PlayerState.PLAYING) R.drawable.player_pause else R.drawable.player_play
+            if (state.state is PlayerState.Playing) R.drawable.player_pause else R.drawable.player_play
         ))
 
-        binding?.timing?.text = state.timing
+        binding?.timing?.text = state.state.progress
     }
 
     private fun getCoverArtwork(trackDto: Track): String {

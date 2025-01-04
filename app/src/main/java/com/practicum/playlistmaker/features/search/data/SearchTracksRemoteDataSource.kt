@@ -1,10 +1,8 @@
 package com.practicum.playlistmaker.features.search.data
 
-import android.util.Log
 import com.practicum.playlistmaker.features.search.data.dto.TracksResponse
 import com.practicum.playlistmaker.features.search.data.dto.TracksResponseItem
 import com.practicum.playlistmaker.features.search.domain.models.Track
-import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.text.SimpleDateFormat
@@ -15,19 +13,15 @@ import java.util.Locale
 class SearchTracksRemoteDataSource(
     private val tracksService: TracksApi,
 ) {
-    fun getSearchResults(text: String): List<Track>? {
+    suspend fun getSearchResults(text: String): List<Track>? {
         val response = try {
-            tracksService.searchTracks(text).execute()
+            tracksService.searchTracks(text)
         } catch(e: Exception) {
             return null
         }
 
-        if (response.code() != 200) {
-            return null
-        }
-
-        val results = response.body()?.results
-        if (results?.isNotEmpty() == true) {
+        val results = response.results
+        if (results.isNotEmpty()) {
             val formattedTracks = results.map {
                 formatTrack(it)
             }
@@ -66,6 +60,6 @@ class SearchTracksRemoteDataSource(
 
     interface TracksApi {
         @GET("/search?entity=song")
-        fun searchTracks(@Query("term") text: String): Call<TracksResponse>
+        suspend fun searchTracks(@Query("term") text: String): TracksResponse
     }
 }

@@ -18,7 +18,7 @@ val repositoryModule = module {
     }
 
     single<SearchTracksRepository> {
-        SearchTracksRepositoryImpl(get(), get())
+        SearchTracksRepositoryImpl(get())
     }
 
     // Player
