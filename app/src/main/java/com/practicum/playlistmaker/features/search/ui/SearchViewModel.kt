@@ -60,9 +60,12 @@ class SearchViewModel(
         textLiveData.postValue(value)
 
         val showRecentTracks = isSearchFocused && value.isEmpty() && recentTracks.isNotEmpty()
+        val showBase = isSearchFocused && value.isEmpty()
 
         if (showRecentTracks) {
             contentStateLiveData.postValue(SearchContentStateVO.Recent(recentTracks))
+        } else if (showBase) {
+            contentStateLiveData.postValue(SearchContentStateVO.Base)
         }
 
         searchTracksDebounced(Unit)
