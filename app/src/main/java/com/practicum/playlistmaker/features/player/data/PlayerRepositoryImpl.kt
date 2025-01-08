@@ -31,6 +31,10 @@ import com.practicum.playlistmaker.features.player.domain.api.PlayerRepository
         mediaPlayer.release()
     }
 
+    override fun isPlaying(): Boolean {
+        return mediaPlayer.isPlaying
+    }
+
     override fun getCurrentTime(): Int {
         return mediaPlayer.currentPosition
     }

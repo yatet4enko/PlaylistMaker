@@ -1,17 +1,17 @@
 package com.practicum.playlistmaker.features.search.ui
 
 import android.app.Application
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.common.ui.SingleLiveEvent
+import com.practicum.playlistmaker.common.utils.debounce
 import com.practicum.playlistmaker.features.search.domain.api.RecentTracksInteractor
 import com.practicum.playlistmaker.features.search.domain.api.SearchTracksInteractor
-import com.practicum.playlistmaker.features.search.domain.api.SearchTracksInteractor.TracksConsumer
 import com.practicum.playlistmaker.features.search.domain.models.Track
 import com.practicum.playlistmaker.features.search.ui.models.SearchContentStateVO
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     application: Application,
@@ -36,15 +36,20 @@ class SearchViewModel(
     private val hideKeyboard = SingleLiveEvent<Unit>()
     fun observeHideKeyboard(): LiveData<Unit> = hideKeyboard
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val searchTracksRunnable = Runnable { searchTracks() }
+    private val searchTracksDebounced = debounce<Unit>(
+        SEARCH_DEBOUNCE_DELAY_MS,
+        viewModelScope,
+        true,
+    ) {
+        searchTracks()
+    }
 
-    private var isClickAllowed = true
-
-    override fun onCleared() {
-        super.onCleared()
-
-        handler.removeCallbacks(searchTracksRunnable)
+    val onTrackClick = debounce<Track>(
+        CLICK_DEBOUNCE_DELAY_MS,
+        viewModelScope,
+        false,
+    ) { track ->
+        onTrackClick(track)
     }
 
     init {
@@ -55,23 +60,22 @@ class SearchViewModel(
         textLiveData.postValue(value)
 
         val showRecentTracks = isSearchFocused && value.isEmpty() && recentTracks.isNotEmpty()
+        val showBase = isSearchFocused && value.isEmpty()
 
         if (showRecentTracks) {
             contentStateLiveData.postValue(SearchContentStateVO.Recent(recentTracks))
+        } else if (showBase) {
+            contentStateLiveData.postValue(SearchContentStateVO.Base)
         }
 
-        searchTracksDebounced()
+        searchTracksDebounced(Unit)
     }
 
     fun onUpdateButtonClick() {
         searchTracks()
     }
 
-    fun onTrackClick(track: Track) {
-        if (!clickDebounce()) {
-            return
-        }
-
+    private fun onTrackClick(track: Track) {
         recentTracksInteractor.add(track)
         updateRecentTracks()
 
@@ -106,11 +110,6 @@ class SearchViewModel(
         contentStateLiveData.postValue(SearchContentStateVO.Base)
     }
 
-    private fun searchTracksDebounced() {
-        handler.removeCallbacks(searchTracksRunnable)
-        handler.postDelayed(searchTracksRunnable, SEARCH_DEBOUNCE_DELAY_MS)
-    }
-
     private fun searchTracks() {
         val text = text.value ?: ""
         if (text.isEmpty()) {
@@ -119,31 +118,22 @@ class SearchViewModel(
 
         contentStateLiveData.postValue(SearchContentStateVO.Loading)
 
-        searchTracksInteractor.search(text, object :
-            TracksConsumer {
-            override fun consume(foundTracks: List<Track>?) {
-                if (foundTracks == null) {
-                    contentStateLiveData.postValue(SearchContentStateVO.Error)
-                    return
+        viewModelScope.launch {
+            searchTracksInteractor.search(text)
+                .collect { foundTracks ->
+                    if (foundTracks == null) {
+                        contentStateLiveData.postValue(SearchContentStateVO.Error)
+                        return@collect
+                    }
+
+                    if (foundTracks.isEmpty()) {
+                        contentStateLiveData.postValue(SearchContentStateVO.Empty)
+                        return@collect
+                    }
+
+                    contentStateLiveData.postValue(SearchContentStateVO.Success(foundTracks))
                 }
-
-                if (foundTracks.isEmpty()) {
-                    contentStateLiveData.postValue(SearchContentStateVO.Empty)
-                    return
-                }
-
-                contentStateLiveData.postValue(SearchContentStateVO.Success(foundTracks))
-            }
-        })
-    }
-
-    private fun clickDebounce() : Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY_MS)
         }
-        return current
     }
 
     private fun updateRecentTracks() {

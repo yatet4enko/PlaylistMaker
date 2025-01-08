@@ -6,6 +6,7 @@ interface PlayerInteractor {
     fun pause()
     fun release()
     fun getCurrentTime(): Int
+    fun isPlaying(): Boolean
 
     interface PlayerConsumer {
         fun onPrepared()
