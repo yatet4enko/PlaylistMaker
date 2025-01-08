@@ -3,6 +3,7 @@ package com.practicum.playlistmaker.features.search.domain.impl
 import com.practicum.playlistmaker.features.search.domain.api.RecentTracksInteractor
 import com.practicum.playlistmaker.features.search.domain.api.RecentTracksRepository
 import com.practicum.playlistmaker.features.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
 
 class RecentTracksInteractorImpl(
     private val recentTracksRepository: RecentTracksRepository,
@@ -15,7 +16,7 @@ class RecentTracksInteractorImpl(
         return recentTracksRepository.add(track)
     }
 
-    override fun getRecentTracks(): List<Track> {
+    override suspend fun getRecentTracks(): Flow<List<Track>> {
         return recentTracksRepository.getRecentTracks()
     }
 

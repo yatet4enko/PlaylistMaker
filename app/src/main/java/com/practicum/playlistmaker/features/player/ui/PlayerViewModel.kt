@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.features.media.domain.api.FavoriteTracksInteractor
 import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor
 import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor.PlayerConsumer
 import com.practicum.playlistmaker.features.player.ui.models.PlayerState
@@ -20,7 +21,8 @@ import java.util.Locale
 
 class PlayerViewModel(
     application: Application,
-    private val playerInteractor: PlayerInteractor
+    private val playerInteractor: PlayerInteractor,
+    private val favoriteTracksInteractor: FavoriteTracksInteractor,
 ): AndroidViewModel(application) {
 
     private val playerStateLiveData = MutableLiveData(DEFAULT_STATE)
@@ -63,6 +65,28 @@ class PlayerViewModel(
             }
 
         })
+    }
+
+    fun onFavoriteClick() {
+        playerStateLiveData.value?.track?.let { track ->
+            if (track.isFavorite) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    favoriteTracksInteractor.remove(track)
+                }
+            } else {
+                viewModelScope.launch((Dispatchers.IO)) {
+                    favoriteTracksInteractor.add(track)
+                }
+            }
+
+            val currentState = playerStateLiveData.value ?: DEFAULT_STATE
+
+            playerStateLiveData.postValue(currentState.copy(
+                track = track.copy(
+                    isFavorite = !track.isFavorite
+                )
+            ))
+        }
     }
 
     fun onPlayButtonClick() {

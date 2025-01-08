@@ -11,4 +11,5 @@ data class Track(
     val country: String,
     val collectionName: String?,
     val previewUrl: String,
+    val isFavorite: Boolean = false,
 )
