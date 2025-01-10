@@ -6,8 +6,6 @@ import com.practicum.playlistmaker.features.search.domain.models.Track
 import retrofit2.http.GET
 import retrofit2.http.Query
 import java.text.SimpleDateFormat
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class SearchTracksRemoteDataSource(
@@ -51,11 +49,7 @@ class SearchTracksRemoteDataSource(
     }
 
     private fun extractYear(dateTimeString: String): Int {
-        val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-
-        val dateTime = OffsetDateTime.parse(dateTimeString, formatter)
-
-        return dateTime.year
+        return dateTimeString.split("-", limit = 2)[0].toInt()
     }
 
     interface TracksApi {
