@@ -51,20 +51,22 @@ class PlayerViewModel(
             track = track,
         ))
 
-        playerInteractor.prepare(track.previewUrl, object : PlayerConsumer {
-            override fun onPrepared() {
-                playerStateLiveData.postValue(getCurrentState().copy(
-                    state = PlayerState.Prepared(),
-                ))
-            }
+        track.previewUrl?.let {
+            playerInteractor.prepare(it, object : PlayerConsumer {
+                override fun onPrepared() {
+                    playerStateLiveData.postValue(getCurrentState().copy(
+                        state = PlayerState.Prepared(),
+                    ))
+                }
 
-            override fun onCompletion() {
-                playerStateLiveData.postValue(getCurrentState().copy(
-                    state = PlayerState.Prepared(),
-                ))
-            }
+                override fun onCompletion() {
+                    playerStateLiveData.postValue(getCurrentState().copy(
+                        state = PlayerState.Prepared(),
+                    ))
+                }
 
-        })
+            })
+        }
     }
 
     fun onFavoriteClick() {
@@ -139,8 +141,6 @@ class PlayerViewModel(
         updateTimingJob = viewModelScope.launch {
             while (playerInteractor.isPlaying()) {
                 updatePlayTiming()
-
-                Log.i("GGWP", "111")
 
                 delay(300)
             }

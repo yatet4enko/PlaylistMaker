@@ -41,7 +41,9 @@ class SearchTracksRemoteDataSource(
             trackTime = trackTime,
             country = data.country,
             primaryGenreName = data.primaryGenreName,
-            year = extractYear(data.releaseDate),
+            year = data.releaseDate?.let {
+                extractYear(it)
+            },
             artworkUrl100 = data.artworkUrl100,
             collectionName = data.collectionName,
             previewUrl = data.previewUrl,

@@ -6,9 +6,9 @@ data class TracksResponseItem(
     val artistName: String,
     val trackTimeMillis: Int,
     val artworkUrl100: String,
-    val releaseDate: String,
+    val releaseDate: String? = null,
     val primaryGenreName: String,
     val country: String,
     val collectionName: String? = null,
-    val previewUrl: String,
+    val previewUrl: String? = null,
 )

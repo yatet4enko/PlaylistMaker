@@ -11,9 +11,9 @@ data class TrackEntity(
     val trackName: String,
     val artistName: String,
     val collectionName: String,
-    val year: Int,
+    val year: Int?,
     val primaryGenreName: String,
     val country: String,
     val trackTime: String,
-    val previewUrl: String,
+    val previewUrl: String?,
 )
