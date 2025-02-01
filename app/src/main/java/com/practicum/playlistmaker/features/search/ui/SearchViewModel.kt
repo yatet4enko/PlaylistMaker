@@ -1,23 +1,29 @@
 package com.practicum.playlistmaker.features.search.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.common.ui.SingleLiveEvent
 import com.practicum.playlistmaker.common.utils.debounce
+import com.practicum.playlistmaker.features.media.domain.api.FavoriteTracksInteractor
 import com.practicum.playlistmaker.features.search.domain.api.RecentTracksInteractor
 import com.practicum.playlistmaker.features.search.domain.api.SearchTracksInteractor
 import com.practicum.playlistmaker.features.search.domain.models.Track
 import com.practicum.playlistmaker.features.search.ui.models.SearchContentStateVO
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
     application: Application,
     private val recentTracksInteractor: RecentTracksInteractor,
     private val searchTracksInteractor: SearchTracksInteractor,
-): AndroidViewModel(application) {
+    private val favoriteTracksInteractor: FavoriteTracksInteractor,
+): AndroidViewModel(application), DefaultLifecycleObserver {
     private val recentTracks = ArrayList<Track>()
     private var isSearchFocused = false
 
@@ -54,6 +60,47 @@ class SearchViewModel(
 
     init {
         updateRecentTracks()
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+
+        // Костыли для актуализации данных о добавленных в избранные
+        actualizeFavorites()
+    }
+
+    private fun actualizeFavorites() {
+        when (val state = contentStateLiveData.value) {
+            // Тут жостко копипаста, потому что хз, как их объединить, он не понимает,
+            // что в обоих случаях у меня есть поле tracks и тд
+            is SearchContentStateVO.Success -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    favoriteTracksInteractor.getAllIds().collect { ids ->
+                        contentStateLiveData.postValue(
+                            state.copy(
+                                tracks = state.tracks.map { track ->
+                                    track.copy(isFavorite = ids.contains(track.id))
+                                }
+                            )
+                        )
+                    }
+                }
+            }
+            is SearchContentStateVO.Recent -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    favoriteTracksInteractor.getAllIds().collect { ids ->
+                        contentStateLiveData.postValue(
+                            state.copy(
+                                tracks = state.tracks.map { track ->
+                                    track.copy(isFavorite = ids.contains(track.id))
+                                }
+                            )
+                        )
+                    }
+                }
+            }
+            else -> {}
+        }
     }
 
     fun onTextChange(value: String) {
@@ -138,7 +185,12 @@ class SearchViewModel(
 
     private fun updateRecentTracks() {
         recentTracks.clear()
-        recentTracks.addAll(recentTracksInteractor.getRecentTracks())
+
+        viewModelScope.launch(Dispatchers.IO) {
+            recentTracksInteractor.getRecentTracks().collect { tracks ->
+                recentTracks.addAll(tracks)
+            }
+        }
     }
 
     companion object {

@@ -51,6 +51,10 @@ class PlayerActivity : AppCompatActivity() {
         binding?.playButton?.setOnClickListener {
             viewModel.onPlayButtonClick()
         }
+
+        binding?.favButton?.setOnClickListener {
+            viewModel.onFavoriteClick()
+        }
     }
 
     override fun onStop() {
@@ -70,7 +74,6 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun fulfillPlayer(state: PlayerStateVO) {
-        Log.i("GGWP", "fulfillPlayer ${state}")
         state.track?.let { track ->
             binding?.trackName?.text = track.trackName
             binding?.artistName?.text = track.artistName
@@ -96,6 +99,10 @@ class PlayerActivity : AppCompatActivity() {
                         .into(it)
                 }
             }
+
+            binding?.favButton?.setImageDrawable(resources.getDrawable(
+                if (track.isFavorite) R.drawable.player_fav_active else R.drawable.player_fav
+            ))
         }
 
         binding?.playButton?.isEnabled = state.state !is PlayerState.Default

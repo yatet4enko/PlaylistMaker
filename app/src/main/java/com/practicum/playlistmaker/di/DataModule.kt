@@ -2,7 +2,9 @@ package com.practicum.playlistmaker.di
 
 import android.content.Context
 import android.media.MediaPlayer
+import androidx.room.Room
 import com.google.gson.Gson
+import com.practicum.playlistmaker.features.media.data.db.AppDatabase
 import com.practicum.playlistmaker.features.player.data.PlayerRepositoryImpl
 import com.practicum.playlistmaker.features.player.domain.api.PlayerRepository
 import com.practicum.playlistmaker.features.search.data.RecentTracksDiskDataSource
@@ -54,7 +56,7 @@ val dataModule = module {
     }
 
     single<RecentTracksRepository> {
-        RecentTracksRepositoryImpl(get(), get())
+        RecentTracksRepositoryImpl(get(), get(), get())
     }
 
     single {
@@ -62,7 +64,7 @@ val dataModule = module {
     }
 
     single<SearchTracksRepository> {
-        SearchTracksRepositoryImpl(get())
+        SearchTracksRepositoryImpl(get(), get())
     }
 
     // Player
@@ -85,6 +87,13 @@ val dataModule = module {
 
     single<SettingsRepository> {
         SettingsRepositoryImpl(get())
+    }
+
+    // Media
+
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .build()
     }
 
 }

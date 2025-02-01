@@ -11,11 +11,11 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel {
-        PlayerViewModel(androidApplication(), get())
+        PlayerViewModel(androidApplication(), get(), get())
     }
 
     viewModel {
-        SearchViewModel(androidApplication(), get(), get())
+        SearchViewModel(androidApplication(), get(), get(), get())
     }
 
     viewModel {
@@ -23,7 +23,7 @@ val viewModelModule = module {
     }
 
     viewModel {
-        FavoritesTracksViewModel()
+        FavoritesTracksViewModel(get())
     }
 
     viewModel {

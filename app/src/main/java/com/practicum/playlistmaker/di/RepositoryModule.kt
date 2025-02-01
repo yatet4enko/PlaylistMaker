@@ -1,5 +1,7 @@
 package com.practicum.playlistmaker.di
 
+import com.practicum.playlistmaker.features.media.data.FavoriteTracksRepositoryImpl
+import com.practicum.playlistmaker.features.media.domain.api.FavoriteTracksRepository
 import com.practicum.playlistmaker.features.player.data.PlayerRepositoryImpl
 import com.practicum.playlistmaker.features.player.domain.api.PlayerRepository
 import com.practicum.playlistmaker.features.search.data.RecentTracksRepositoryImpl
@@ -14,16 +16,15 @@ val repositoryModule = module {
     // Search
 
     single<RecentTracksRepository> {
-        RecentTracksRepositoryImpl(get(), get())
+        RecentTracksRepositoryImpl(get(), get(), get())
     }
 
     single<SearchTracksRepository> {
-        SearchTracksRepositoryImpl(get())
+        SearchTracksRepositoryImpl(get(), get())
     }
 
     // Player
 
-    // Вопрос
     factory<PlayerRepository> {
         PlayerRepositoryImpl(get())
     }
@@ -32,6 +33,11 @@ val repositoryModule = module {
 
     single<SettingsRepository> {
         SettingsRepositoryImpl(get())
+    }
+
+    // Media
+    single<FavoriteTracksRepository> {
+        FavoriteTracksRepositoryImpl(get(), get())
     }
 
 }
