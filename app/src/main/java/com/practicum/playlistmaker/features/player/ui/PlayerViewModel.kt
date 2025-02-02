@@ -6,7 +6,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.common.ui.SingleLiveEvent
 import com.practicum.playlistmaker.features.media.domain.api.FavoriteTracksInteractor
+import com.practicum.playlistmaker.features.media.domain.api.ImageInteractor
+import com.practicum.playlistmaker.features.media.domain.api.PlaylistInteractor
+import com.practicum.playlistmaker.features.media.domain.models.Playlist
+import com.practicum.playlistmaker.features.media.ui.models.PlaylistVO
 import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor
 import com.practicum.playlistmaker.features.player.domain.api.PlayerInteractor.PlayerConsumer
 import com.practicum.playlistmaker.features.player.ui.models.PlayerState
@@ -16,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -23,10 +29,24 @@ class PlayerViewModel(
     application: Application,
     private val playerInteractor: PlayerInteractor,
     private val favoriteTracksInteractor: FavoriteTracksInteractor,
+    private val playlistInteractor: PlaylistInteractor,
+    private val imageInteractor: ImageInteractor,
 ): AndroidViewModel(application) {
 
     private val playerStateLiveData = MutableLiveData(DEFAULT_STATE)
     val playerState: LiveData<PlayerStateVO> = playerStateLiveData
+
+    private val playlistsStateLiveData: MutableLiveData<List<PlaylistVO>> = MutableLiveData(emptyList())
+    val playlistsState: LiveData<List<PlaylistVO>> = playlistsStateLiveData
+
+    private val showTrackInPlaylistToast = SingleLiveEvent<String>()
+    fun observeShowTrackInPlaylistToast(): LiveData<String> = showTrackInPlaylistToast
+
+    private val showTrackAddedToPlaylistToast = SingleLiveEvent<String>()
+    fun observeShowTrackAddedToPlaylistToast(): LiveData<String> = showTrackAddedToPlaylistToast
+
+    private val hidePlaylists = SingleLiveEvent<Unit>()
+    fun observeHidePlaylists(): LiveData<Unit> = hidePlaylists
 
     private var isInitialized = false
 
@@ -66,6 +86,68 @@ class PlayerViewModel(
                 }
 
             })
+        }
+
+        viewModelScope.launch {
+            playlistInteractor.getAll()
+                .collect { playlists ->
+                    playlistsStateLiveData.postValue(
+                        playlists.map {
+                            PlaylistVO(
+                                id = it.id ?: 0,
+                                name = it.name,
+                                description = it.description,
+                                trackIds = it.trackIds,
+                                artworkFilename = it.artworkFilename,
+                                artworkUri = if (it.artworkFilename.isEmpty()) {
+                                    null
+                                } else {
+                                    imageInteractor.getImageUri(it.artworkFilename)
+                                }
+                            )
+                        }
+                    )
+                }
+        }
+    }
+
+    fun onAddToPlaylist(playlistVO: PlaylistVO) {
+        viewModelScope.launch {
+            val trackId = playerState.value?.track?.id ?: return@launch
+
+            if (playlistVO.trackIds.contains(trackId)) {
+                showTrackInPlaylistToast.postValue(playlistVO.name)
+
+                return@launch
+            }
+
+            playlistInteractor.addTrackToPlaylist(
+                Playlist(
+                    id = playlistVO.id,
+                    name = playlistVO.name,
+                    description = playlistVO.description,
+                    artworkFilename = playlistVO.artworkFilename,
+                    trackIds = playlistVO.trackIds,
+                ),
+                trackId,
+            )
+
+            playlistsStateLiveData.postValue(
+                playlistsStateLiveData.value?.map {
+                    if (it.id == playlistVO.id) {
+                        it.copy(
+                            trackIds = it.trackIds + trackId
+                        )
+                    } else {
+                        it
+                    }
+                }
+            )
+
+            showTrackAddedToPlaylistToast.postValue(playlistVO.name)
+
+            hidePlaylists.postValue(Unit)
+
         }
     }
 
