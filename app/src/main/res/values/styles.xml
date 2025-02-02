@@ -62,4 +62,7 @@
         <item name="trackTint">@color/gray_light</item>
         <item name="thumbTint">@color/gray</item>
     </style>
+    <style name="RoundedImageView">
+        <item name="cornerSize">24dp</item>
+    </style>
 </resources>

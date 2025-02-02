@@ -2,17 +2,21 @@ package com.practicum.playlistmaker.features.player.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.view.View.VISIBLE
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.common.ui.dpToPx
 import com.practicum.playlistmaker.databinding.ActivityPlayerBinding
+import com.practicum.playlistmaker.features.media.ui.CreatePlaylistFragment
+import com.practicum.playlistmaker.features.media.ui.models.PlaylistVO
 import com.practicum.playlistmaker.features.player.ui.models.PlayerState
 import com.practicum.playlistmaker.features.player.ui.models.PlayerStateVO
 import com.practicum.playlistmaker.features.search.domain.models.Track
@@ -24,6 +28,10 @@ class PlayerActivity : AppCompatActivity() {
     private var binding: ActivityPlayerBinding? = null
 
     private val gson = Gson()
+
+    private val playlistsAdapter = PlaylistsAdapter {
+        onAddToPlaylist(it)
+    }
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +45,18 @@ class PlayerActivity : AppCompatActivity() {
 
         viewModel.playerState.observe(this) { state ->
             fulfillPlayer(state)
+        }
+
+        viewModel.playlistsState.observe(this) { state ->
+            fulfillPlaylists(state)
+        }
+
+        viewModel.observeShowTrackInPlaylistToast().observe(this) {
+            Toast.makeText(this, getString(R.string.track_already_added_to_playlist, it), Toast.LENGTH_LONG).show()
+        }
+
+        viewModel.observeShowTrackAddedToPlaylistToast().observe(this) {
+            Toast.makeText(this, getString(R.string.track_added_to_playlist, it), Toast.LENGTH_LONG).show()
         }
 
         try {
@@ -55,6 +75,49 @@ class PlayerActivity : AppCompatActivity() {
         binding?.favButton?.setOnClickListener {
             viewModel.onFavoriteClick()
         }
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding!!.playlistsBottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding?.overlay?.visibility = View.GONE
+                    }
+                    else -> {
+                        binding?.overlay?.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
+
+
+        viewModel.observeHidePlaylists().observe(this) {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        binding?.addButton?.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+
+        binding?.playlists?.adapter = playlistsAdapter
+
+        binding?.createPlaylist?.setOnClickListener {
+            val fragment = CreatePlaylistFragment()
+
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container_view, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     override fun onStop() {
@@ -71,6 +134,12 @@ class PlayerActivity : AppCompatActivity() {
             supportActionBar?.setDisplayShowHomeEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
+    }
+
+    private fun fulfillPlaylists(state: List<PlaylistVO>) {
+        playlistsAdapter.playlists.clear()
+        playlistsAdapter.playlists.addAll(state)
+        playlistsAdapter.notifyDataSetChanged()
     }
 
     private fun fulfillPlayer(state: PlayerStateVO) {
@@ -126,6 +195,10 @@ class PlayerActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun onAddToPlaylist(playlist: PlaylistVO) {
+        viewModel.onAddToPlaylist(playlist)
     }
 
     companion object {
