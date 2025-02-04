@@ -63,6 +63,6 @@
         <item name="thumbTint">@color/gray</item>
     </style>
     <style name="RoundedImageView">
-        <item name="cornerSize">24dp</item>
+        <item name="cornerSize">8dp</item>
     </style>
 </resources>
