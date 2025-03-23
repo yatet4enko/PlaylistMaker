@@ -4,7 +4,16 @@ import android.content.Context
 import android.media.MediaPlayer
 import androidx.room.Room
 import com.google.gson.Gson
+import com.practicum.playlistmaker.features.media.data.ImageRepositoryImpl
+import com.practicum.playlistmaker.features.media.data.PlaylistRepositoryImpl
 import com.practicum.playlistmaker.features.media.data.db.AppDatabase
+import com.practicum.playlistmaker.features.media.data.formatters.PlaylistFormatter
+import com.practicum.playlistmaker.features.media.domain.api.ImageInteractor
+import com.practicum.playlistmaker.features.media.domain.api.ImageRepository
+import com.practicum.playlistmaker.features.media.domain.api.PlaylistInteractor
+import com.practicum.playlistmaker.features.media.domain.api.PlaylistRepository
+import com.practicum.playlistmaker.features.media.domain.impl.ImageInteractorImpl
+import com.practicum.playlistmaker.features.media.domain.impl.PlaylistInteractorImpl
 import com.practicum.playlistmaker.features.player.data.PlayerRepositoryImpl
 import com.practicum.playlistmaker.features.player.domain.api.PlayerRepository
 import com.practicum.playlistmaker.features.search.data.RecentTracksDiskDataSource
@@ -96,4 +105,7 @@ val dataModule = module {
             .build()
     }
 
+    single {
+        PlaylistFormatter()
+    }
 }

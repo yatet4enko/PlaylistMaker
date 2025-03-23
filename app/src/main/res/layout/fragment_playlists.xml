@@ -4,49 +4,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Направляющие -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/left_top_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="100dp" />
+        app:layout_constraintGuide_begin="70dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/right_top_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="100dp" />
+        app:layout_constraintGuide_end="70dp" />
 
-    <ImageView
-        android:id="@+id/not_found_image"
-        android:src="@drawable/not_found"
-        android:layout_marginTop="120dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="120dp"
-        android:layout_height="120dp" />
-
-    <TextView
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_bottom_guideline"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        app:layout_constraintStart_toStartOf="@id/left_top_guideline"
-        app:layout_constraintEnd_toEndOf="@id/right_top_guideline"
-        app:layout_constraintTop_toBottomOf="@+id/not_found_image"
-        android:layout_marginTop="@dimen/space_xl"
-        android:text="@string/playlists_empty"
-        android:textAlignment="center"
-        style="@style/SearchErrorStyle" />
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="@dimen/space_xl" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_bottom_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="@dimen/space_xl" />
 
     <Button
-        android:id="@+id/clear_recent"
-        app:layout_constraintStart_toStartOf="@id/left_top_guideline"
-        app:layout_constraintEnd_toEndOf="@id/right_top_guideline"
-        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/create_playlist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_xxl"
+        app:layout_constraintStart_toStartOf="@id/left_top_guideline"
+        app:layout_constraintEnd_toEndOf="@id/right_top_guideline"
+        app:layout_constraintTop_toTopOf="parent"
         android:text="@string/new_playlist"
         android:textSize="@dimen/text_size_s"
         android:textColor="?attr/colorPrimarySurface"
@@ -55,4 +49,42 @@
         android:paddingVertical="6dp"
         android:paddingHorizontal="8dp" />
 
+    <LinearLayout
+        android:id="@+id/empty_state"
+        app:layout_constraintStart_toStartOf="@id/left_top_guideline"
+        app:layout_constraintEnd_toEndOf="@id/right_top_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/create_playlist"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_margin="@dimen/space_xl">
+
+        <ImageView
+            android:id="@+id/not_found_image"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/not_found"
+            android:layout_marginBottom="@dimen/space_l" />
+
+        <TextView
+            android:id="@+id/empty_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/playlists_empty"
+            android:textAlignment="center"
+            style="@style/SearchErrorStyle"
+            android:layout_marginBottom="@dimen/space_m" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/space_xl"
+        app:layout_constraintStart_toStartOf="@id/left_bottom_guideline"
+        app:layout_constraintEnd_toEndOf="@id/right_bottom_guideline"
+        app:layout_constraintTop_toBottomOf="@id/create_playlist"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

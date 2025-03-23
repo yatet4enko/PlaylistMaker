@@ -1,7 +1,11 @@
 package com.practicum.playlistmaker.di
 
 import com.practicum.playlistmaker.features.media.data.FavoriteTracksRepositoryImpl
+import com.practicum.playlistmaker.features.media.data.ImageRepositoryImpl
+import com.practicum.playlistmaker.features.media.data.PlaylistRepositoryImpl
 import com.practicum.playlistmaker.features.media.domain.api.FavoriteTracksRepository
+import com.practicum.playlistmaker.features.media.domain.api.ImageRepository
+import com.practicum.playlistmaker.features.media.domain.api.PlaylistRepository
 import com.practicum.playlistmaker.features.player.data.PlayerRepositoryImpl
 import com.practicum.playlistmaker.features.player.domain.api.PlayerRepository
 import com.practicum.playlistmaker.features.search.data.RecentTracksRepositoryImpl
@@ -38,6 +42,14 @@ val repositoryModule = module {
     // Media
     single<FavoriteTracksRepository> {
         FavoriteTracksRepositoryImpl(get(), get())
+    }
+
+    single<PlaylistRepository> {
+        PlaylistRepositoryImpl(get(), get())
+    }
+
+    single<ImageRepository> {
+        ImageRepositoryImpl(get())
     }
 
 }
