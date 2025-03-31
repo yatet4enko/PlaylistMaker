@@ -2,7 +2,6 @@ package com.practicum.playlistmaker.features.media.ui
 
 import android.graphics.Rect
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 
 import android.view.LayoutInflater
@@ -41,7 +40,6 @@ class PlaylistsFragment : Fragment() {
             )
         }
 
-
         val space = requireContext().resources.getDimensionPixelSize(R.dimen.space_l)
 
         binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
@@ -49,6 +47,15 @@ class PlaylistsFragment : Fragment() {
             GridSpacingItemDecoration(2, space, false),
         )
         binding.recyclerView.adapter = playlistsAdapter
+
+        viewModel.observeNavigatePlaylist().observe(viewLifecycleOwner) { id ->
+            findNavController().navigate(
+                R.id.action_mediaFragment_to_playlistFragment,
+                Bundle().apply {
+                    putInt(ARG_ID, id)
+                }
+            )
+        }
 
         viewModel.state.observe(viewLifecycleOwner) {
             val playlists = it

@@ -15,6 +15,9 @@ interface TrackDao {
     @Delete
     fun removeTrack(track: TrackEntity)
 
+    @Query("DELETE FROM track_table WHERE id = :trackId")
+    fun removeTrackById(trackId: Int)
+
     @Query("SELECT * FROM track_table ORDER BY createdAt ASC")
     fun getAllTracks(): List<TrackEntity>
 

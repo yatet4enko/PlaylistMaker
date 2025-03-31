@@ -19,10 +19,10 @@ import com.practicum.playlistmaker.databinding.FragmentCreatePlaylistBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class CreatePlaylistFragment : Fragment() {
-    private lateinit var binding: FragmentCreatePlaylistBinding
+open class CreatePlaylistFragment : Fragment() {
+    open lateinit var binding: FragmentCreatePlaylistBinding
 
-    private val viewModel: CreatePlaylistViewModel by viewModel()
+    open val viewModel: CreatePlaylistViewModel by viewModel()
 
     private lateinit var backConfirmDialog: MaterialAlertDialogBuilder
 
@@ -91,11 +91,15 @@ class CreatePlaylistFragment : Fragment() {
     private fun initToolbarUI() {
         binding.toolbar.setNavigationIcon(R.drawable.back_icon)
         binding.toolbar.setNavigationOnClickListener {
-            if (viewModel.isFormEmpty()) {
-                goBack()
-            } else {
-                backConfirmDialog.show()
-            }
+            onBackClick()
+        }
+    }
+
+    open fun onBackClick() {
+        if (viewModel.isFormEmpty()) {
+            goBack()
+        } else {
+            backConfirmDialog.show()
         }
     }
 
@@ -160,7 +164,7 @@ class CreatePlaylistFragment : Fragment() {
         }
     }
 
-    private fun goBack() {
+    open fun goBack() {
         val navController = try {
             findNavController()
         } catch (e: IllegalStateException) {

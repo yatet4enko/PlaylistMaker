@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.practicum.playlistmaker.features.media.data.db.PlaylistEntity
 import com.practicum.playlistmaker.features.media.domain.models.Playlist
 import kotlinx.coroutines.flow.Flow
@@ -16,6 +17,15 @@ interface PlaylistDao {
     @Query("SELECT * FROM playlist_table")
     fun getAll(): Flow<List<PlaylistEntity>>
 
+    @Query("DELETE FROM playlist_table WHERE id = :playlistId")
+    suspend fun removePlaylistById(playlistId: Int)
+
     @Query("UPDATE playlist_table SET tracksIds = :updatedTracksIds, tracksCount = tracksCount + 1 WHERE id = :playlistId")
     suspend fun updatePlaylistTracks(playlistId: Int, updatedTracksIds: String)
+
+    @Query("SELECT * FROM playlist_table WHERE id = :playlistId")
+    fun getPlaylistById(playlistId: Int): Flow<PlaylistEntity?>
+
+    @Update
+    suspend fun updatePlaylist(playlist: PlaylistEntity)
 }

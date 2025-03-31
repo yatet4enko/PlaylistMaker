@@ -23,5 +23,9 @@ class PlaylistsViewHolder(view: View): RecyclerView.ViewHolder(view) {
         playlist.artworkUri?.let {
             artwork.setImageURI(it)
         }
+
+        itemView.setOnClickListener {
+            playlist.onClick(playlist.id)
+        }
     }
 }

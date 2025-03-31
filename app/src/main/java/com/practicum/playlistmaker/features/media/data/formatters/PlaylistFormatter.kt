@@ -17,7 +17,8 @@ class PlaylistFormatter {
                 emptyList()
             } else {
                 entity.tracksIds.split(",").map { it.toInt()  }
-            }
+            },
+            createdAt = entity.createdAt,
         )
     }
 

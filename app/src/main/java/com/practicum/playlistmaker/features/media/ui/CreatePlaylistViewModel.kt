@@ -14,11 +14,11 @@ import com.practicum.playlistmaker.features.search.domain.models.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CreatePlaylistViewModel(
+open class CreatePlaylistViewModel(
     private val imageInteractor: ImageInteractor,
     private val playlistInteractor: PlaylistInteractor,
 ): ViewModel() {
-    private val stateLiveData = MutableLiveData(
+    open val stateLiveData = MutableLiveData(
         NewPlaylistStateVO(
             name = "",
             description = "",
@@ -32,7 +32,7 @@ class CreatePlaylistViewModel(
     private val showSuccessToast = SingleLiveEvent<String>()
     fun observeShowSuccessToast(): LiveData<String> = showSuccessToast
 
-    private val close = SingleLiveEvent<Unit>()
+    open val close = SingleLiveEvent<Unit>()
     fun observeClose(): LiveData<Unit> = close
 
     fun onChangeName(name: String) {
@@ -55,7 +55,7 @@ class CreatePlaylistViewModel(
         ))
     }
 
-    fun onSubmit() {
+    open fun onSubmit() {
         val current = state.value ?: return
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -64,6 +64,7 @@ class CreatePlaylistViewModel(
                 description = current.description,
                 artworkFilename = current.artworkFilename,
                 trackIds = emptyList(),
+                createdAt = System.currentTimeMillis(),
             ))
 
             showSuccessToast.postValue(current.name)

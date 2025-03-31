@@ -16,7 +16,8 @@ class TrackFormatter {
             primaryGenreName = dto.primaryGenreName,
             country = dto.country,
             collectionName = dto.collectionName,
-            previewUrl = dto.previewUrl
+            previewUrl = dto.previewUrl,
+            trackTimeMillis = dto.trackTimeMillis,
         )
     }
 
@@ -31,7 +32,8 @@ class TrackFormatter {
             primaryGenreName = track.primaryGenreName,
             country = track.country,
             collectionName = track.collectionName,
-            previewUrl = track.previewUrl
+            previewUrl = track.previewUrl,
+            trackTimeMillis = track.trackTimeMillis,
         )
     }
 
@@ -40,13 +42,14 @@ class TrackFormatter {
             id = entity.id,
             trackName = entity.trackName,
             artistName = entity.artistName,
-            trackTime = entity.trackTime,
+            trackTime = entity.trackTimeMillis.toString(),
             artworkUrl100 = entity.artworkUrl100,
             year = entity.year,
             primaryGenreName = entity.primaryGenreName,
             country = entity.country,
             collectionName = entity.collectionName,
-            previewUrl = entity.previewUrl
+            previewUrl = entity.previewUrl,
+            trackTimeMillis = entity.trackTimeMillis
         )
     }
 
@@ -55,13 +58,13 @@ class TrackFormatter {
             id = track.id,
             trackName = track.trackName,
             artistName = track.artistName,
-            trackTime = track.trackTime,
             artworkUrl100 = track.artworkUrl100,
             year = track.year,
             primaryGenreName = track.primaryGenreName,
             country = track.country,
             collectionName = track.collectionName?: "",
-            previewUrl = track.previewUrl
+            previewUrl = track.previewUrl,
+            trackTimeMillis = track.trackTimeMillis,
         )
     }
 }

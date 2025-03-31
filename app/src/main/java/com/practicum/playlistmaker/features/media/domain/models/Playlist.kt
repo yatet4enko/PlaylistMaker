@@ -5,5 +5,6 @@ data class Playlist(
     val name: String,
     val artworkFilename: String,
     val description: String,
+    val createdAt: Long,
     val trackIds: List<Int>,
 )

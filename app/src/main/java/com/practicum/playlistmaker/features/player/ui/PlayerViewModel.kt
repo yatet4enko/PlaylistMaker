@@ -103,7 +103,8 @@ class PlayerViewModel(
                                     null
                                 } else {
                                     imageInteractor.getImageUri(it.artworkFilename)
-                                }
+                                },
+                                onClick = {}
                             )
                         }
                     )
@@ -128,6 +129,7 @@ class PlayerViewModel(
                     description = playlistVO.description,
                     artworkFilename = playlistVO.artworkFilename,
                     trackIds = playlistVO.trackIds,
+                    createdAt = System.currentTimeMillis(),
                 ),
                 trackId,
             )

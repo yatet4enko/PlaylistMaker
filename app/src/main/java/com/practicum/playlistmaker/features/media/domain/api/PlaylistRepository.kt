@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.features.media.domain.api
 
 import com.practicum.playlistmaker.features.media.domain.models.Playlist
+import com.practicum.playlistmaker.features.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 
 interface PlaylistRepository {
@@ -8,5 +9,15 @@ interface PlaylistRepository {
 
     suspend fun addTrackToPlaylist(playlist: Playlist, trackId: Int)
 
+    suspend fun updatePlaylist(playlist: Playlist)
+
+    suspend fun removeTrackFromPlaylist(playlistId: Int, trackId: Int)
+
+    suspend fun removePlaylist(playlistId: Int)
+
     fun getAll(): Flow<List<Playlist>>
+
+    fun getPlaylist(id: Int): Flow<Playlist?>
+
+    suspend fun getPlaylistTracks(trackIds: List<Int>): List<Track>
 }

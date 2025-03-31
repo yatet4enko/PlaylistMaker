@@ -12,6 +12,7 @@ import com.practicum.playlistmaker.features.search.domain.models.Track
 
 class SearchResultsAdapter(
     private val clickListener: TrackClickListener,
+    private val longClickListener: TrackClickListener,
 ): RecyclerView.Adapter<SearchResultsAdapter.SearchResultsItemViewHolder>() {
     val tracks = ArrayList<Track>()
 
@@ -42,6 +43,12 @@ class SearchResultsAdapter(
 
             itemView.setOnClickListener {
                 clickListener.onTrackClick(trackDto)
+            }
+
+            itemView.setOnLongClickListener {
+                longClickListener.onTrackClick(trackDto)
+
+                true
             }
 
             Glide
