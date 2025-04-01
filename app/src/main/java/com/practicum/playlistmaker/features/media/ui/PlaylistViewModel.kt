@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.features.media.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -38,7 +39,11 @@ class PlaylistViewModel(
                 .collect { playlistDomain ->
                     playlistDomain ?: return@collect
 
+                    Log.i("GGWP", "${playlistDomain}")
+
                     val tracks = playlistInteractor.getPlaylistTracks(playlistDomain.trackIds)
+
+                    Log.i("GGWP", "${tracks}")
 
                     val calendar = Calendar.getInstance()
                     calendar.timeInMillis = playlistDomain.createdAt

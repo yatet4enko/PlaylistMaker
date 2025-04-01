@@ -22,14 +22,16 @@ class PlaylistRepositoryImpl(
             .insertPlaylist(playlistFormatter.toEntity(playlist))
     }
 
-    override suspend fun addTrackToPlaylist(playlist: Playlist, trackId: Int) {
+    override suspend fun addTrackToPlaylist(playlist: Playlist, track: Track) {
         val id = playlist.id ?: return
 
         db.playlistDao()
             .updatePlaylistTracks(
                 id,
-                (playlist.trackIds + trackId).joinToString(separator = ",")
+                (playlist.trackIds + track.id).joinToString(separator = ",")
             )
+
+        db.trackDao().insertTrack(trackFormatter.toEntity(track))
     }
 
     override suspend fun updatePlaylist(playlist: Playlist) {

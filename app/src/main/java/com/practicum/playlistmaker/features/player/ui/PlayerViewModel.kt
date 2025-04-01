@@ -114,9 +114,9 @@ class PlayerViewModel(
 
     fun onAddToPlaylist(playlistVO: PlaylistVO) {
         viewModelScope.launch {
-            val trackId = playerState.value?.track?.id ?: return@launch
+            val track = playerState.value?.track ?: return@launch
 
-            if (playlistVO.trackIds.contains(trackId)) {
+            if (playlistVO.trackIds.contains(track.id)) {
                 showTrackInPlaylistToast.postValue(playlistVO.name)
 
                 return@launch
@@ -131,14 +131,14 @@ class PlayerViewModel(
                     trackIds = playlistVO.trackIds,
                     createdAt = System.currentTimeMillis(),
                 ),
-                trackId,
+                track,
             )
 
             playlistsStateLiveData.postValue(
                 playlistsStateLiveData.value?.map {
                     if (it.id == playlistVO.id) {
                         it.copy(
-                            trackIds = it.trackIds + trackId
+                            trackIds = it.trackIds + track.id
                         )
                     } else {
                         it
