@@ -23,15 +23,17 @@ class PlaylistRepositoryImpl(
     }
 
     override suspend fun addTrackToPlaylist(playlist: Playlist, track: Track) {
-        val id = playlist.id ?: return
+        withContext(Dispatchers.IO) {
+            val id = playlist.id ?: return@withContext
 
-        db.playlistDao()
-            .updatePlaylistTracks(
-                id,
-                (playlist.trackIds + track.id).joinToString(separator = ",")
-            )
+            db.playlistDao()
+                .updatePlaylistTracks(
+                    id,
+                    (playlist.trackIds + track.id).joinToString(separator = ",")
+                )
 
-        db.trackDao().insertTrack(trackFormatter.toEntity(track))
+            db.trackDao().insertTrack(trackFormatter.toEntity(track))
+        }
     }
 
     override suspend fun updatePlaylist(playlist: Playlist) {
@@ -43,30 +45,34 @@ class PlaylistRepositoryImpl(
     }
 
     private suspend fun removeTrackIfNeNuzhen(trackId: Int) {
-        val allPlaylists = db.playlistDao().getAll().first().map { playlistFormatter.fromEntity(it) }
-        val playlistWithTrack = allPlaylists.firstOrNull {
-            it.trackIds.contains(trackId)
-        }
+        withContext(Dispatchers.IO) {
+            val allPlaylists = db.playlistDao().getAll().first().map { playlistFormatter.fromEntity(it) }
+            val playlistWithTrack = allPlaylists.firstOrNull {
+                it.trackIds.contains(trackId)
+            }
 
-        if (playlistWithTrack == null) {
-            db.trackDao().removeTrackById(trackId)
+            if (playlistWithTrack == null) {
+                db.trackDao().removeTrackById(trackId)
+            }
         }
     }
 
     override suspend fun removeTrackFromPlaylist(playlistId: Int, trackId: Int) {
-        val playlist = getPlaylist(playlistId).first()
+        withContext(Dispatchers.IO) {
+            val playlist = getPlaylist(playlistId).first()
 
-        playlist?.let { playlist ->
-            val id = playlist.id ?: return
+            playlist?.let { playlist ->
+                val id = playlist.id ?: return@withContext
 
-            db.playlistDao()
-                .updatePlaylistTracks(
-                    id,
-                    (playlist.trackIds - trackId).joinToString(separator = ",")
-                )
+                db.playlistDao()
+                    .updatePlaylistTracks(
+                        id,
+                        (playlist.trackIds - trackId).joinToString(separator = ",")
+                    )
 
 
-            removeTrackIfNeNuzhen(trackId)
+                removeTrackIfNeNuzhen(trackId)
+            }
         }
     }
 
