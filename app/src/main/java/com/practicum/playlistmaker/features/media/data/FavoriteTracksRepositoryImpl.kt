@@ -5,7 +5,7 @@ import com.practicum.playlistmaker.features.media.domain.api.FavoriteTracksRepos
 import com.practicum.playlistmaker.features.search.data.formatters.TrackFormatter
 import com.practicum.playlistmaker.features.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 class FavoriteTracksRepositoryImpl(
     private val db: AppDatabase,
@@ -13,20 +13,30 @@ class FavoriteTracksRepositoryImpl(
 ): FavoriteTracksRepository {
     override suspend fun add(track: Track) {
         db.trackDao()
-            .insertTrack(trackFormatter.toEntity(track))
+            .removeTrack(trackFormatter.toEntity(track))
+
+        db.trackDao()
+            .insertTrack(trackFormatter.toEntity(track.copy(isFavorite = true)))
     }
 
     override suspend fun remove(track: Track) {
         db.trackDao()
             .removeTrack(trackFormatter.toEntity(track))
 
+        db.trackDao()
+            .insertTrack(trackFormatter.toEntity(track.copy(isFavorite = false)))
     }
 
-    override suspend fun getAll(): Flow<List<Track>> = flow {
-        emit(db.trackDao().getAllTracks().map { trackFormatter.fromEntity(it) })
+    override fun getAll(): Flow<List<Track>> {
+        return db.trackDao().getAllTracks().map {
+            it.map { trackFormatter.fromEntity(it) }
+        }
     }
 
-    override suspend fun getAllIds(): Flow<List<Int>> = flow {
-        emit(db.trackDao().getAllTracks().map { it.id })
+
+    override suspend fun getAllIds(): Flow<List<Int>> {
+        return db.trackDao().getAllTracks().map {
+            it.filter { it.isFavorite }.map { it.id }
+        }
     }
 }

@@ -46,12 +46,13 @@ class PlaylistRepositoryImpl(
 
     private suspend fun removeTrackIfNeNuzhen(trackId: Int) {
         withContext(Dispatchers.IO) {
+            val track = db.trackDao().getAllTracks().first().firstOrNull { it.id == trackId }
             val allPlaylists = db.playlistDao().getAll().first().map { playlistFormatter.fromEntity(it) }
             val playlistWithTrack = allPlaylists.firstOrNull {
                 it.trackIds.contains(trackId)
             }
 
-            if (playlistWithTrack == null) {
+            if (playlistWithTrack == null && track?.isFavorite == false) {
                 db.trackDao().removeTrackById(trackId)
             }
         }
@@ -70,7 +71,6 @@ class PlaylistRepositoryImpl(
                         id,
                         (playlist.trackIds - trackId).joinToString(separator = ",")
                     )
-
 
                 removeTrackIfNeNuzhen(trackId)
             }
@@ -108,12 +108,6 @@ class PlaylistRepositoryImpl(
     }
 
     override suspend fun getPlaylistTracks(trackIds: List<Int>): List<Track> {
-        return withContext(Dispatchers.IO) {
-            db.trackDao().getAllTracks().filter { track ->
-                trackIds.contains(track.id)
-            }.map {
-                trackFormatter.fromEntity(it)
-            }
-        }
+        return emptyList()
     }
 }

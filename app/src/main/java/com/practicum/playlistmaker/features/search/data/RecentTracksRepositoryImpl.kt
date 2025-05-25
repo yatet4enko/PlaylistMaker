@@ -23,7 +23,7 @@ class RecentTracksRepositoryImpl(
     }
 
     override suspend fun getRecentTracks(): Flow<List<Track>> = flow {
-        val favoriteTracksIds = db.trackDao().getAllTrackIds()
+        val favoriteTracksIds = db.trackDao().getAllFavoriteTrackIds()
 
         emit(
             recentTracksDiskDataSource.getRecentTracks()

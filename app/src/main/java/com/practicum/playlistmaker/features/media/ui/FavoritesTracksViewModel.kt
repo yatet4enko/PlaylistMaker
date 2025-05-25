@@ -40,7 +40,7 @@ class FavoritesTracksViewModel(
 
     private fun actualizeFavorites() {
         viewModelScope.launch(Dispatchers.IO) {
-            favoriteTracksInteractor.getAll().collect { favoriteTracks ->
+            favoriteTracksInteractor.getAllFavorites().collect { favoriteTracks ->
                 stateLiveData.postValue(
                     if (favoriteTracks.isEmpty()) FavoriteTracksStateVO.Empty else FavoriteTracksStateVO.Default(favoriteTracks)
                 )

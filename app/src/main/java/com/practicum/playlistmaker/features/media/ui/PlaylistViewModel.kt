@@ -8,10 +8,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.common.ui.SingleLiveEvent
+import com.practicum.playlistmaker.features.media.domain.api.FavoriteTracksInteractor
 import com.practicum.playlistmaker.features.media.domain.api.ImageInteractor
 import com.practicum.playlistmaker.features.media.domain.api.PlaylistInteractor
 import com.practicum.playlistmaker.features.media.ui.models.FullPlaylistVO
 import com.practicum.playlistmaker.features.search.domain.models.Track
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -19,6 +21,7 @@ class PlaylistViewModel(
     private val application: Application,
     private val playlistInteractor: PlaylistInteractor,
     private val imageInteractor: ImageInteractor,
+    private val tracksInteractor: FavoriteTracksInteractor,
 ): AndroidViewModel(application) {
 
     private val _data: MutableLiveData<FullPlaylistVO?> = MutableLiveData(null)
@@ -35,47 +38,51 @@ class PlaylistViewModel(
 
     fun loadPlaylist(id: Int) {
         viewModelScope.launch {
-            playlistInteractor.getPlaylist(id)
-                .collect { playlistDomain ->
-                    playlistDomain ?: return@collect
+            playlistInteractor.getPlaylist(id).combine(tracksInteractor.getAll()) { playlistDomain, allTracks ->
+                Pair(playlistDomain, allTracks)
+            }.collect {
+                data ->
+                val playlistDomain = data.first
+                val allTracks = data.second
 
-                    Log.i("GGWP", "${playlistDomain}")
+                playlistDomain ?: return@collect
 
-                    val tracks = playlistInteractor.getPlaylistTracks(playlistDomain.trackIds)
+                val tracks = playlistDomain.trackIds.map { id ->
+                    allTracks.firstOrNull { it.id == id }
+                }.filterNotNull()
 
-                    Log.i("GGWP", "${tracks}")
+                val calendar = Calendar.getInstance()
+                calendar.timeInMillis = playlistDomain.createdAt
+                val year = calendar.get(Calendar.YEAR)
 
-                    val calendar = Calendar.getInstance()
-                    calendar.timeInMillis = playlistDomain.createdAt
-                    val year = calendar.get(Calendar.YEAR)
+                val totalMillis = tracks.sumOf { it.trackTimeMillis }
+                val totalMunites = totalMillis / (1000 * 60)
 
-                    val totalMillis = tracks.sumOf { it.trackTimeMillis }
-                    val totalMunites = totalMillis / (1000 * 60)
+                _data.value = FullPlaylistVO(
+                    id = playlistDomain.id!!,
+                    name = playlistDomain.name,
+                    year = year.toString(),
+                    artworkFilename = playlistDomain.artworkFilename,
+                    artworkUri = if (playlistDomain.artworkFilename.isEmpty()) {
+                        null
+                    } else {
+                        imageInteractor.getImageUri(playlistDomain.artworkFilename)
+                    },
+                    minutesDescription = application.resources.getQuantityString(
+                        R.plurals.n_minutes,
+                        totalMunites,
+                        totalMunites,
+                    ),
+                    tracksDescription = application.resources.getQuantityString(
+                        R.plurals.n_tracks,
+                        tracks.size,
+                        tracks.size,
+                    ),
+                    description = playlistDomain.description,
+                    tracks = tracks,
+                )
+            }
 
-                    _data.value = FullPlaylistVO(
-                        id = playlistDomain.id!!,
-                        name = playlistDomain.name,
-                        year = year.toString(),
-                        artworkFilename = playlistDomain.artworkFilename,
-                        artworkUri = if (playlistDomain.artworkFilename.isEmpty()) {
-                            null
-                        } else {
-                            imageInteractor.getImageUri(playlistDomain.artworkFilename)
-                        },
-                        minutesDescription = application.resources.getQuantityString(
-                            R.plurals.n_minutes,
-                            totalMunites,
-                            totalMunites,
-                        ),
-                        tracksDescription = application.resources.getQuantityString(
-                            R.plurals.n_tracks,
-                            tracks.size,
-                            tracks.size,
-                        ),
-                        description = playlistDomain.description,
-                        tracks = tracks,
-                    )
-                }
         }
     }
 

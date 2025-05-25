@@ -17,4 +17,5 @@ data class TrackEntity(
     val trackTimeMillis: Int,
     val previewUrl: String?,
     val createdAt: Long = System.currentTimeMillis(),
+    val isFavorite: Boolean,
 )

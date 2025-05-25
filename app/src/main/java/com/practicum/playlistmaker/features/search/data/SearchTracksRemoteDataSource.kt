@@ -48,6 +48,7 @@ class SearchTracksRemoteDataSource(
             collectionName = data.collectionName,
             previewUrl = data.previewUrl,
             trackTimeMillis = data.trackTimeMillis,
+            isFavorite = false,
         )
     }
 

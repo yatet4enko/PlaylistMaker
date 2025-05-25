@@ -12,5 +12,5 @@ data class Track(
     val collectionName: String?,
     val previewUrl: String?,
     val trackTimeMillis: Int,
-    val isFavorite: Boolean = false,
+    val isFavorite: Boolean,
 )

@@ -75,7 +75,7 @@ class SearchViewModel(
             // что в обоих случаях у меня есть поле tracks и тд
             is SearchContentStateVO.Success -> {
                 viewModelScope.launch(Dispatchers.IO) {
-                    favoriteTracksInteractor.getAllIds().collect { ids ->
+                    favoriteTracksInteractor.getAllFavoritesIds().collect { ids ->
                         contentStateLiveData.postValue(
                             state.copy(
                                 tracks = state.tracks.map { track ->
@@ -88,7 +88,7 @@ class SearchViewModel(
             }
             is SearchContentStateVO.Recent -> {
                 viewModelScope.launch(Dispatchers.IO) {
-                    favoriteTracksInteractor.getAllIds().collect { ids ->
+                    favoriteTracksInteractor.getAllFavoritesIds().collect { ids ->
                         contentStateLiveData.postValue(
                             state.copy(
                                 tracks = state.tracks.map { track ->
