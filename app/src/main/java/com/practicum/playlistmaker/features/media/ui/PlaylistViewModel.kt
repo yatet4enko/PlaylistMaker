@@ -49,7 +49,7 @@ class PlaylistViewModel(
 
                 val tracks = playlistDomain.trackIds.map { id ->
                     allTracks.firstOrNull { it.id == id }
-                }.filterNotNull()
+                }.filterNotNull().reversed()
 
                 val calendar = Calendar.getInstance()
                 calendar.timeInMillis = playlistDomain.createdAt
