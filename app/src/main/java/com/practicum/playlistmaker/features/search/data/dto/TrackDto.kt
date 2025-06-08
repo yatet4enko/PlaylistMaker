@@ -11,4 +11,6 @@ data class TrackDto(
     val country: String,
     val collectionName: String?,
     val previewUrl: String?,
+    val trackTimeMillis: Int,
+    val isFavorite: Boolean,
 )

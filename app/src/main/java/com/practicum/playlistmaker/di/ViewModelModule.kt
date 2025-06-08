@@ -2,7 +2,9 @@ package com.practicum.playlistmaker.di
 
 import com.practicum.playlistmaker.features.media.ui.CreatePlaylistViewModel
 import com.practicum.playlistmaker.features.media.ui.FavoritesTracksViewModel
+import com.practicum.playlistmaker.features.media.ui.PlaylistViewModel
 import com.practicum.playlistmaker.features.media.ui.PlaylistsViewModel
+import com.practicum.playlistmaker.features.media.ui.EditPlaylistViewModel
 import com.practicum.playlistmaker.features.player.ui.PlayerViewModel
 import com.practicum.playlistmaker.features.search.ui.SearchViewModel
 import com.practicum.playlistmaker.features.settings.ui.SettingsViewModel
@@ -32,7 +34,15 @@ val viewModelModule = module {
     }
 
     viewModel {
+        PlaylistViewModel(androidApplication(), get() , get(), get())
+    }
+
+    viewModel {
         CreatePlaylistViewModel(get(), get())
+    }
+
+    viewModel {
+        EditPlaylistViewModel(get(), get())
     }
 }
 

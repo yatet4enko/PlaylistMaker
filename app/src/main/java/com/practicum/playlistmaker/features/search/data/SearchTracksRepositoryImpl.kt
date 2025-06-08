@@ -14,7 +14,7 @@ class SearchTracksRepositoryImpl(
 ): SearchTracksRepository {
     override fun search(text: String): Flow<List<Track>?> = flow {
         val favoriteTracksIds = withContext(Dispatchers.IO) {
-            db.trackDao().getAllTrackIds()
+            db.trackDao().getAllFavoriteTrackIds()
         }
 
         emit(

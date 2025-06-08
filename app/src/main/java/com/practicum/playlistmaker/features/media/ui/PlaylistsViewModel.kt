@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.common.ui.SingleLiveEvent
 import com.practicum.playlistmaker.features.media.domain.api.ImageInteractor
 import com.practicum.playlistmaker.features.media.domain.api.PlaylistInteractor
 import com.practicum.playlistmaker.features.media.ui.models.PlaylistVO
@@ -16,6 +17,9 @@ class PlaylistsViewModel(
 
     private val stateLiveData: MutableLiveData<List<PlaylistVO>> = MutableLiveData(emptyList())
     val state: LiveData<List<PlaylistVO>> = stateLiveData
+
+    private val navigatePlaylist = SingleLiveEvent<Int>()
+    fun observeNavigatePlaylist(): LiveData<Int> = navigatePlaylist
 
     init {
         viewModelScope.launch {
@@ -33,6 +37,9 @@ class PlaylistsViewModel(
                                     null
                                 } else {
                                     imageInteractor.getImageUri(it.artworkFilename)
+                                },
+                                onClick = { id ->
+                                    navigatePlaylist.postValue(id)
                                 }
                             )
                         }

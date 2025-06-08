@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface FavoriteTracksRepository {
     suspend fun add(track: Track)
     suspend fun remove(track: Track)
-    suspend fun getAll(): Flow<List<Track>>
+    fun getAll(): Flow<List<Track>>
     suspend fun getAllIds(): Flow<List<Int>>
 }

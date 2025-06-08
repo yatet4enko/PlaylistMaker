@@ -16,7 +16,9 @@ class TrackFormatter {
             primaryGenreName = dto.primaryGenreName,
             country = dto.country,
             collectionName = dto.collectionName,
-            previewUrl = dto.previewUrl
+            previewUrl = dto.previewUrl,
+            trackTimeMillis = dto.trackTimeMillis,
+            isFavorite = dto.isFavorite,
         )
     }
 
@@ -31,7 +33,9 @@ class TrackFormatter {
             primaryGenreName = track.primaryGenreName,
             country = track.country,
             collectionName = track.collectionName,
-            previewUrl = track.previewUrl
+            previewUrl = track.previewUrl,
+            trackTimeMillis = track.trackTimeMillis,
+            isFavorite = track.isFavorite,
         )
     }
 
@@ -40,13 +44,15 @@ class TrackFormatter {
             id = entity.id,
             trackName = entity.trackName,
             artistName = entity.artistName,
-            trackTime = entity.trackTime,
+            trackTime = formatMillisToMinutesAndSeconds(entity.trackTimeMillis),
             artworkUrl100 = entity.artworkUrl100,
             year = entity.year,
             primaryGenreName = entity.primaryGenreName,
             country = entity.country,
             collectionName = entity.collectionName,
-            previewUrl = entity.previewUrl
+            previewUrl = entity.previewUrl,
+            trackTimeMillis = entity.trackTimeMillis,
+            isFavorite = entity.isFavorite,
         )
     }
 
@@ -55,13 +61,22 @@ class TrackFormatter {
             id = track.id,
             trackName = track.trackName,
             artistName = track.artistName,
-            trackTime = track.trackTime,
             artworkUrl100 = track.artworkUrl100,
             year = track.year,
             primaryGenreName = track.primaryGenreName,
             country = track.country,
             collectionName = track.collectionName?: "",
-            previewUrl = track.previewUrl
+            previewUrl = track.previewUrl,
+            trackTimeMillis = track.trackTimeMillis,
+            isFavorite = track.isFavorite,
         )
+    }
+
+    fun formatMillisToMinutesAndSeconds(millis: Int): String {
+        val totalSeconds = millis / 1000
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+
+        return String.format("%02d:%02d", minutes, seconds)
     }
 }

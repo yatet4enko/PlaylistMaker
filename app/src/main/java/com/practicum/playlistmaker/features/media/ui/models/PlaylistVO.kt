@@ -9,4 +9,5 @@ data class PlaylistVO(
     val artworkFilename: String,
     val description: String,
     val trackIds: List<Int>,
+    val onClick: (id: Int) -> Unit,
 )

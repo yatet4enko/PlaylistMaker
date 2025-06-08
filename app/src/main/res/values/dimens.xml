@@ -10,6 +10,7 @@
     <dimen name="settings_screen_item_icon_size">48dp</dimen>
     <dimen name="settings_screen_item_icon_padding">12dp</dimen>
 
+    <dimen name="text_size_xl">24sp</dimen>
     <dimen name="text_size_l">22sp</dimen>
     <dimen name="text_size_m">16sp</dimen>
     <dimen name="text_size_s">14sp</dimen>
@@ -25,6 +26,7 @@
     <dimen name="space_m">10dp</dimen>
     <dimen name="space_l">12dp</dimen>
     <dimen name="space_xl">16dp</dimen>
+    <dimen name="space_xl2">22dp</dimen>
     <dimen name="space_xxl">24dp</dimen>
     <dimen name="space_xxxl">32dp</dimen>
 </resources>

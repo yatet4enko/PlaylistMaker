@@ -17,15 +17,19 @@ class FavoriteTracksInteractorImpl(
         favoriteTracksRepository.remove(track)
     }
 
-    override suspend fun getAll(): Flow<List<Track>> {
+    override fun getAll(): Flow<List<Track>> {
         return favoriteTracksRepository.getAll().map { list ->
-            list.reversed().map {
-                track -> track.copy(isFavorite = true)
-            }
+            list.reversed()
         }
     }
 
-    override suspend fun getAllIds(): Flow<List<Int>> {
+    override fun getAllFavorites(): Flow<List<Track>> {
+        return favoriteTracksRepository.getAll().map { list ->
+            list.reversed().filter { it.isFavorite }
+        }
+    }
+
+    override suspend fun getAllFavoritesIds(): Flow<List<Int>> {
         return favoriteTracksRepository.getAllIds()
     }
 }

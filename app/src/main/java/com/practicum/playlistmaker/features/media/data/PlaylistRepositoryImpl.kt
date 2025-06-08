@@ -4,26 +4,90 @@ import com.practicum.playlistmaker.features.media.data.db.AppDatabase
 import com.practicum.playlistmaker.features.media.data.formatters.PlaylistFormatter
 import com.practicum.playlistmaker.features.media.domain.api.PlaylistRepository
 import com.practicum.playlistmaker.features.media.domain.models.Playlist
+import com.practicum.playlistmaker.features.search.data.formatters.TrackFormatter
+import com.practicum.playlistmaker.features.search.domain.models.Track
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 class PlaylistRepositoryImpl(
     private val db: AppDatabase,
     private val playlistFormatter: PlaylistFormatter,
+    private val trackFormatter: TrackFormatter,
 ): PlaylistRepository {
     override suspend fun add(playlist: Playlist) {
         db.playlistDao()
             .insertPlaylist(playlistFormatter.toEntity(playlist))
     }
 
-    override suspend fun addTrackToPlaylist(playlist: Playlist, trackId: Int) {
-        val id = playlist.id ?: return
+    override suspend fun addTrackToPlaylist(playlist: Playlist, track: Track) {
+        withContext(Dispatchers.IO) {
+            val id = playlist.id ?: return@withContext
 
-        db.playlistDao()
-            .updatePlaylistTracks(
-                id,
-                (playlist.trackIds + trackId).joinToString(separator = ",")
+            db.playlistDao()
+                .updatePlaylistTracks(
+                    id,
+                    (playlist.trackIds + track.id).joinToString(separator = ",")
+                )
+
+            db.trackDao().insertTrack(trackFormatter.toEntity(track))
+        }
+    }
+
+    override suspend fun updatePlaylist(playlist: Playlist) {
+        withContext(Dispatchers.IO) {
+            db.playlistDao().updatePlaylist(
+                playlistFormatter.toEntity(playlist)
             )
+        }
+    }
+
+    private suspend fun removeTrackIfNeNuzhen(trackId: Int) {
+        withContext(Dispatchers.IO) {
+            val track = db.trackDao().getAllTracks().first().firstOrNull { it.id == trackId }
+            val allPlaylists = db.playlistDao().getAll().first().map { playlistFormatter.fromEntity(it) }
+            val playlistWithTrack = allPlaylists.firstOrNull {
+                it.trackIds.contains(trackId)
+            }
+
+            if (playlistWithTrack == null && track?.isFavorite == false) {
+                db.trackDao().removeTrackById(trackId)
+            }
+        }
+    }
+
+    override suspend fun removeTrackFromPlaylist(playlistId: Int, trackId: Int) {
+        withContext(Dispatchers.IO) {
+            val playlist = getPlaylist(playlistId).first()
+
+
+            playlist?.let { playlist ->
+                val id = playlist.id ?: return@withContext
+
+                db.playlistDao()
+                    .updatePlaylistTracks(
+                        id,
+                        (playlist.trackIds - trackId).joinToString(separator = ",")
+                    )
+
+                removeTrackIfNeNuzhen(trackId)
+            }
+        }
+    }
+
+    override suspend fun removePlaylist(playlistId: Int) {
+        withContext(Dispatchers.IO) {
+            val playlist = db.playlistDao().getPlaylistById(playlistId).first()?.let { playlistFormatter.fromEntity(it) } ?: return@withContext
+            val trackIds = playlist.trackIds
+
+            db.playlistDao().removePlaylistById(playlistId)
+
+            trackIds.forEach { trackId ->
+                removeTrackIfNeNuzhen(trackId)
+            }
+        }
     }
 
     override fun getAll(): Flow<List<Playlist>> {
@@ -33,5 +97,17 @@ class PlaylistRepositoryImpl(
                     playlistFormatter.fromEntity(it)
                 }
             }
+    }
+
+    override fun getPlaylist(id: Int): Flow<Playlist?> {
+        return db.playlistDao()
+            .getPlaylistById(id)
+            .map { it?.let {
+                playlistFormatter.fromEntity(it)
+            } }
+    }
+
+    override suspend fun getPlaylistTracks(trackIds: List<Int>): List<Track> {
+        return emptyList()
     }
 }

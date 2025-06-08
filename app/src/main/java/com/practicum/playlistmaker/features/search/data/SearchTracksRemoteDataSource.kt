@@ -47,6 +47,8 @@ class SearchTracksRemoteDataSource(
             artworkUrl100 = data.artworkUrl100,
             collectionName = data.collectionName,
             previewUrl = data.previewUrl,
+            trackTimeMillis = data.trackTimeMillis,
+            isFavorite = false,
         )
     }
 

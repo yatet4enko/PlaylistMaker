@@ -24,9 +24,10 @@ class FavoritesTracksFragment : Fragment() {
 
     private val gson = Gson()
 
-    private val favoriteTracksAdapter = SearchResultsAdapter {
-        viewModel.onTrackClick(it)
-    }
+    private val favoriteTracksAdapter = SearchResultsAdapter(
+        clickListener = {  viewModel.onTrackClick(it) },
+        longClickListener = {},
+    )
 
     // Костыли для актуализации данных о добавленных в избранные
     override fun onCreate(savedInstanceState: Bundle?) {

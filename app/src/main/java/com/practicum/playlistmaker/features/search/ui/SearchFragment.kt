@@ -29,12 +29,14 @@ class SearchFragment : Fragment() {
 
     private lateinit var binding: FragmentSearchBinding
 
-    private val tracksAdapter = SearchResultsAdapter {
-        viewModel.onTrackClick(it)
-    }
-    private val recentTracksAdapter = SearchResultsAdapter {
-        viewModel.onTrackClick(it)
-    }
+    private val tracksAdapter = SearchResultsAdapter(
+        clickListener = { viewModel.onTrackClick(it) },
+        longClickListener = {},
+    )
+    private val recentTracksAdapter = SearchResultsAdapter(
+        clickListener = { viewModel.onTrackClick(it) },
+        longClickListener = {},
+    )
 
     private val gson = Gson()
 
